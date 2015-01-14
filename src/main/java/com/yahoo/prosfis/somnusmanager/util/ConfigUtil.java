@@ -1,6 +1,7 @@
 package com.yahoo.prosfis.somnusmanager.util;
 
 import org.bukkit.Location;
+import org.bukkit.Server;
 import org.bukkit.configuration.file.FileConfiguration;
 
 public class ConfigUtil {
@@ -16,4 +17,17 @@ public class ConfigUtil {
 		config.set(path + "Pitch", loc.getPitch());
 	}
 
+	public static Location loadLocation(Server server,
+			FileConfiguration config, String path) {
+		Location loc = null;
+		if (config.getBoolean(path + "Set")) {
+			new Location(server.getWorld(config.getString(path + "World")),
+					config.getDouble(path + "X"), config.getDouble(path + "Y"),
+					config.getDouble(path + "Z"), Float.parseFloat(config
+							.getString(path + "Yaw")), Float.parseFloat(config
+							.getString(path + "Pitch")));
+
+		}
+		return loc;
+	}
 }

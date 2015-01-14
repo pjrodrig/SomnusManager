@@ -32,17 +32,20 @@ public class ArenaCommandExecutor implements CommandExecutor {
 				Player player = (Player) sender;
 				if (player.hasPermission("SomnusManager.admin")) {
 					if (args[1].equalsIgnoreCase("warp")) {
-						if (args.length == 1) {
+						if (args.length == 2) {
 							am.setWarp(player.getLocation());
+							player.sendMessage(ChatColor.GREEN + "Arena warp set.");
 							return true;
 						}
 					} else if (args[1].equalsIgnoreCase("spawn")) {
 						if (args.length == 3) {
 							if (args[2].equalsIgnoreCase("red")) {
 								am.setRedSpawn(player.getLocation());
+								player.sendMessage(ChatColor.GREEN + "Red spawn set.");
 								return true;
 							} else if (args[2].equalsIgnoreCase("blue")) {
 								am.setBlueSpawn(player.getLocation());
+								player.sendMessage(ChatColor.GREEN + "Blue spawn set.");
 								return true;
 							}
 						}
