@@ -6,8 +6,8 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.yahoo.prosfis.somnusmanager.arena.ArenaCommandExecutor;
-import com.yahoo.prosfis.somnusmanager.arena.ArenaListener;
 import com.yahoo.prosfis.somnusmanager.arena.ArenaManager;
+import com.yahoo.prosfis.somnusmanager.arena.listeners.ArenaListener;
 
 public class SomnusManager extends JavaPlugin {
 	
@@ -35,13 +35,13 @@ public class SomnusManager extends JavaPlugin {
 	
 	public void registerListeners(){
 		PluginManager pm = getServer().getPluginManager();
-		pm.registerEvents(new ArenaListener(), this);
+		pm.registerEvents(new ArenaListener(am), this);
 	}
 
 	public boolean onCommand(CommandSender sender, Command cmd, String label,
 			String[] args) {
 		String command = cmd.getName();
-		if (command.equalsIgnoreCase("invalidMob")) {
+		if (command.equalsIgnoreCase("----")) {
 		}
 		return false;
 	}

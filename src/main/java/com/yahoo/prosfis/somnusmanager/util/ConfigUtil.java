@@ -21,7 +21,7 @@ public class ConfigUtil {
 			FileConfiguration config, String path) {
 		Location loc = null;
 		if (config.getBoolean(path + "Set")) {
-			new Location(server.getWorld(config.getString(path + "World")),
+			loc = new Location(server.getWorld(config.getString(path + "World")),
 					config.getDouble(path + "X"), config.getDouble(path + "Y"),
 					config.getDouble(path + "Z"), Float.parseFloat(config
 							.getString(path + "Yaw")), Float.parseFloat(config

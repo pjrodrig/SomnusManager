@@ -1,4 +1,4 @@
-package com.yahoo.prosfis.somnusmanager.arena;
+package com.yahoo.prosfis.somnusmanager.arena.listeners;
 
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
@@ -7,10 +7,14 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 
+import com.yahoo.prosfis.somnusmanager.arena.ArenaManager;
+
 public class ArenaListener implements Listener {
 
-	public ArenaListener() {
+	private final ArenaManager am;
 
+	public ArenaListener(ArenaManager am) {
+		this.am = am;
 	}
 
 	@EventHandler
@@ -22,8 +26,9 @@ public class ArenaListener implements Listener {
 			if (item == Material.WOOD_SWORD || item == Material.IRON_SWORD
 					|| item == Material.GOLD_SWORD
 					|| item == Material.DIAMOND_SWORD) {
-				
+				am.challenge(challenger, (Player) ent);
 			}
+			event.setCancelled(true);
 		}
 	}
 }

@@ -34,18 +34,21 @@ public class ArenaCommandExecutor implements CommandExecutor {
 					if (args[1].equalsIgnoreCase("warp")) {
 						if (args.length == 2) {
 							am.setWarp(player.getLocation());
-							player.sendMessage(ChatColor.GREEN + "Arena warp set.");
+							player.sendMessage(ChatColor.GREEN
+									+ "Arena warp set.");
 							return true;
 						}
 					} else if (args[1].equalsIgnoreCase("spawn")) {
 						if (args.length == 3) {
 							if (args[2].equalsIgnoreCase("red")) {
 								am.setRedSpawn(player.getLocation());
-								player.sendMessage(ChatColor.GREEN + "Red spawn set.");
+								player.sendMessage(ChatColor.GREEN
+										+ "Red spawn set.");
 								return true;
 							} else if (args[2].equalsIgnoreCase("blue")) {
 								am.setBlueSpawn(player.getLocation());
-								player.sendMessage(ChatColor.GREEN + "Blue spawn set.");
+								player.sendMessage(ChatColor.GREEN
+										+ "Blue spawn set.");
 								return true;
 							}
 						}
@@ -57,6 +60,30 @@ public class ArenaCommandExecutor implements CommandExecutor {
 				}
 			} else {
 				sender.sendMessage("Only players may issue this command.");
+				return true;
+			}
+		} else if (args[0].equalsIgnoreCase("quit")) {
+			if (sender instanceof Player) {
+				am.quit((Player) sender);
+			} else {
+				sender.sendMessage("Only players may issue this command.");
+			}
+		} else if (args[0].equalsIgnoreCase("end")) {
+			if (!(sender instanceof Player)
+					|| ((Player) sender).hasPermission("SomnusManager.admin")) {
+				am.forceEnd();
+			} else {
+				sender.sendMessage(ChatColor.RED
+						+ "You do not have permission to use this command.");
+				return true;
+			}
+		} else if (args[0].equalsIgnoreCase("reset")) {
+			if (!(sender instanceof Player)
+					|| ((Player) sender).hasPermission("SomnusManager.admin")) {
+				am.reset();
+			} else {
+				sender.sendMessage(ChatColor.RED
+						+ "You do not have permission to use this command.");
 				return true;
 			}
 		}

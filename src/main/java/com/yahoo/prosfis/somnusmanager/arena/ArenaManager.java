@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.UUID;
@@ -19,6 +20,7 @@ import org.bukkit.entity.Player;
 
 import com.google.common.collect.Maps;
 import com.yahoo.prosfis.somnusmanager.SomnusManager;
+import com.yahoo.prosfis.somnusmanager.arena.listeners.MatchListener;
 import com.yahoo.prosfis.somnusmanager.util.ConfigUtil;
 
 public class ArenaManager {
@@ -31,7 +33,8 @@ public class ArenaManager {
 	private final LinkedList<Match> queue;
 	private final LinkedList<UUID> queued;
 	private boolean active;
-	private UUID red, blue;
+	private Player red, blue;
+	private MatchListener matchListener;
 
 	public ArenaManager(SomnusManager sm) {
 		this.sm = sm;
@@ -88,7 +91,7 @@ public class ArenaManager {
 				addMatch(challenger, challengee, challengerId, challengeeId);
 			} else if (challenges.containsKey(challengerId)) {
 				ArrayList<UUID> list = challenges.get(challengerId);
-				if (list.contains(challengee)) {
+				if (list.contains(challengeeId)) {
 					challenger.sendMessage(ChatColor.RED
 							+ "You have already challenged this player. ");
 					challenger.sendMessage(ChatColor.RED
@@ -107,8 +110,13 @@ public class ArenaManager {
 	private boolean canChallenge(Player challenger, Player challengee,
 			UUID challengerId, UUID challengeeId) {
 		boolean canChallenge = false;
-		if (!(challengerId.equals(red) || challengerId.equals(blue)
-				|| challengeeId.equals(red) || challengeeId.equals(blue))) {
+		UUID redId = null, blueId = null;
+		if (red != null && blue != null) {
+			redId = red.getUniqueId();
+			blueId = blue.getUniqueId();
+		}
+		if (!(challengerId.equals(redId) || challengerId.equals(blueId)
+				|| challengeeId.equals(redId) || challengeeId.equals(blueId))) {
 			if (queued.contains(challengerId)) {
 				challenger
 						.sendMessage(ChatColor.RED
@@ -133,9 +141,16 @@ public class ArenaManager {
 		return isAccepting;
 	}
 
-	private void addChallenge(Player challenger, Player challengee,
-			UUID challengerId, UUID challengeeId) {
+	private void addChallenge(final Player challenger, final Player challengee,
+			final UUID challengerId, final UUID challengeeId) {
 		challenges.get(challengerId).add(challengeeId);
+		sm.getServer().getScheduler().runTaskLater(sm, new Runnable() {
+			public void run() {
+				if (challenges.containsKey(challengerId)) {
+					challenges.get(challengerId).remove(challengeeId);
+				}
+			}
+		}, 200);
 		challenger.sendMessage(ChatColor.GRAY + "You have challenged "
 				+ ChatColor.LIGHT_PURPLE + challengee.getName()
 				+ ChatColor.GRAY + " to a duel.");
@@ -149,6 +164,8 @@ public class ArenaManager {
 	private void addMatch(Player challenger, Player challengee,
 			UUID challengerId, UUID challengeeId) {
 		if (active) {
+			queued.add(challengerId);
+			queued.add(challengeeId);
 			queue.addLast(new Match(challengerId, challengeeId));
 			challenger.sendMessage(ChatColor.GOLD
 					+ "The arena is in use. You have been added to the queue.");
@@ -173,7 +190,6 @@ public class ArenaManager {
 			queue.remove(blueId);
 			Player red = server.getPlayer(redId), blue = server
 					.getPlayer(blueId);
-
 			if (red == null && blue != null) {
 				blue.sendMessage(ChatColor.RED
 						+ "The match was canceled because the other player left the game.");
@@ -181,30 +197,42 @@ public class ArenaManager {
 				red.sendMessage(ChatColor.RED
 						+ "The match was canceled because the other player left the game.");
 			} else if (red != null && blue != null) {
+				this.red = red;
+				this.blue = blue;
 				startMatch(red, blue);
 			}
 		}
 	}
 
 	private void startMatch(Player red, Player blue) {
+		this.red = red;
+		this.blue = blue;
 		active = true;
 		String redName = red.getName(), blueName = blue.getName();
 		red.teleport(redSpawn);
 		blue.teleport(blueSpawn);
-		red.setHealth(red.getMaxHealth());
-		blue.setHealth(blue.getMaxHealth());
+		if (!red.isDead())
+			red.setHealth(red.getMaxHealth());
+		if (!blue.isDead())
+			blue.setHealth(blue.getMaxHealth());
 		// Temporary solution
 		Server server = sm.getServer();
 		ConsoleCommandSender cs = server.getConsoleSender();
 		server.dispatchCommand(cs, "disableClass " + redName);
 		server.dispatchCommand(cs, "disableClass " + blueName);
 		// end temp
-		server.broadcastMessage(ChatColor.RED + redName + ChatColor.GOLD
-				+ " and " + ChatColor.BLUE + blueName + ChatColor.GOLD
-				+ " have agreed to fight in the arena. Type '/arena' to watch.");
+		server.broadcastMessage(ChatColor.RED + redName + ChatColor.GRAY
+				+ " and " + ChatColor.BLUE + blueName + ChatColor.GRAY
+				+ " have agreed to fight in the arena.");
+		server.broadcastMessage(ChatColor.GOLD + "Type '/arena' to spectate.");
+		matchListener = new MatchListener(red, blue, this);
+		server.getPluginManager().registerEvents(matchListener, sm);
 	}
 
 	public void endMatch(Player winner, Player loser) {
+		matchListener.unregister();
+		this.red = null;
+		this.blue = null;
 		String winnerName = winner.getName(), loserName = loser.getName();
 		// Temporary solution
 		Server server = sm.getServer();
@@ -216,16 +244,109 @@ public class ArenaManager {
 		loser.teleport(warp);
 		winner.setFireTicks(0);
 		loser.setFireTicks(0);
-		winner.setHealth(winner.getMaxHealth());
-		loser.setHealth(loser.getMaxHealth());
+		if (!winner.isDead())
+			winner.setHealth(winner.getMaxHealth());
+		if (!loser.isDead())
+			loser.setHealth(loser.getMaxHealth());
 		server.broadcastMessage(ChatColor.GOLD + winnerName + ChatColor.GRAY
-				+ " has defeated " + loserName + " in the arena.");
+				+ " has defeated " + ChatColor.GOLD + loserName
+				+ ChatColor.GRAY + " in the arena.");
 		server.getScheduler().runTaskLater(sm, new Runnable() {
 			public void run() {
 				active = false;
 				startNextMatch();
 			}
 		}, 60);
+	}
+
+	public void quit(Player player) {
+		if (red.equals(player)) {
+			endMatch(blue, red);
+		} else if (blue.equals(player)) {
+			endMatch(red, blue);
+		} else {
+			UUID id = player.getUniqueId();
+			if (queued.contains(id)) {
+				queued.remove(id);
+				Iterator<Match> iter = queue.iterator();
+				Match current;
+				UUID temp;
+				while (iter.hasNext()) {
+					current = iter.next();
+					if (current.contains(id)) {
+						iter.remove();
+						temp = current.getRed();
+						if (temp.equals(id)) {
+							temp = current.getBlue();
+							queued.remove(temp);
+						}
+						queued.remove(temp);
+						sm.getServer()
+								.getPlayer(temp)
+								.sendMessage(
+										ChatColor.GOLD
+												+ player.getName()
+												+ " has quit. You are removed from the queue.");
+						player.sendMessage(ChatColor.GOLD
+								+ "You have been remove from the queue");
+						break;
+					}
+				}
+			} else {
+				player.sendMessage(ChatColor.RED
+						+ "Theres nothing for you to quit.");
+			}
+		}
+	}
+
+	public void forceEnd() {
+		matchListener.unregister();
+		// Temporary solution
+		Server server = sm.getServer();
+		ConsoleCommandSender cs = server.getConsoleSender();
+		server.dispatchCommand(cs, "enableClass " + red.getName());
+		server.dispatchCommand(cs, "enableClass " + blue.getName());
+		// end Temp
+		red.teleport(warp);
+		blue.teleport(warp);
+		red.setFireTicks(0);
+		blue.setFireTicks(0);
+		if (!red.isDead())
+			red.setHealth(red.getMaxHealth());
+		if (!blue.isDead())
+			blue.setHealth(blue.getMaxHealth());
+		server.broadcastMessage(ChatColor.GOLD + "The arena has been reset.");
+		this.red = null;
+		this.blue = null;
+		server.getScheduler().runTaskLater(sm, new Runnable() {
+			public void run() {
+				active = false;
+				startNextMatch();
+			}
+		}, 60);
+	}
+
+	public void reset() {
+		matchListener.unregister();
+		// Temporary solution
+		Server server = sm.getServer();
+		ConsoleCommandSender cs = server.getConsoleSender();
+		server.dispatchCommand(cs, "enableClass " + this.blue.getName());
+		server.dispatchCommand(cs, "enableClass " + this.blue.getName());
+		// end Temp
+		red.teleport(warp);
+		blue.teleport(warp);
+		red.setFireTicks(0);
+		blue.setFireTicks(0);
+		if (!red.isDead())
+			red.setHealth(red.getMaxHealth());
+		if (!blue.isDead())
+			blue.setHealth(blue.getMaxHealth());
+		this.red = null;
+		this.blue = null;
+		active = false;
+		server.broadcastMessage(ChatColor.GOLD
+				+ "The arena has been reset, and the queue emptied.");
 	}
 
 	/*
