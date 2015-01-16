@@ -64,7 +64,7 @@ public class ArenaCommandExecutor implements CommandExecutor {
 			}
 		} else if (args[0].equalsIgnoreCase("quit")) {
 			if (sender instanceof Player) {
-				am.quit((Player) sender);
+				am.quit((Player) sender, true);
 			} else {
 				sender.sendMessage("Only players may issue this command.");
 			}
@@ -96,17 +96,20 @@ public class ArenaCommandExecutor implements CommandExecutor {
 				ChatColor.GOLD + "Arena help menu:",
 				ChatColor.AQUA + "Right click a player with a sword to "
 						+ "challenge them, or accept a challenge.",
-				ChatColor.AQUA + "arena: warp to arena",
-				ChatColor.AQUA + "arena quit: leave duel",
-				ChatColor.AQUA + "arena " });
+				ChatColor.AQUA + "/arena: " + ChatColor.GRAY + "warp to arena",
+				ChatColor.AQUA + "/arena quit: " + ChatColor.GRAY
+						+ "leave duel" });
 		if (!(sender instanceof Player)
 				|| ((Player) sender).hasPermission("SomnusManager.admin")) {
 			sender.sendMessage(new String[] {
 					ChatColor.GOLD + "Arena admin commands:",
-					ChatColor.AQUA + "arena set warp: set location for warp",
-					ChatColor.AQUA + "arena set <redSpawn/blueSpawn>: set "
+					ChatColor.AQUA + "/arena set warp: " + ChatColor.GRAY
+							+ "set location for warp",
+					ChatColor.AQUA + "/arena set <redSpawn/blueSpawn>: "
+							+ ChatColor.GRAY + "set "
 							+ "location for player spawn",
-					ChatColor.AQUA + "arena reset: end any matches in progress" });
+					ChatColor.AQUA + "/arena reset: " + ChatColor.GRAY
+							+ "end any matches in progress" });
 		}
 	}
 }

@@ -30,8 +30,8 @@ public class ArenaManager {
 	private FileConfiguration arenaConfig = null;
 	private File arenaConfigFile = null;
 	private final Map<UUID, ArrayList<UUID>> challenges;
-	private final LinkedList<Match> queue;
-	private final LinkedList<UUID> queued;
+	private LinkedList<Match> queue;
+	private LinkedList<UUID> queued;
 	private boolean active;
 	private Player red, blue;
 	private MatchListener matchListener;
@@ -187,7 +187,7 @@ public class ArenaManager {
 			Server server = sm.getServer();
 			UUID redId = match.getRed(), blueId = match.getBlue();
 			queued.remove(redId);
-			queue.remove(blueId);
+			queued.remove(blueId);
 			Player red = server.getPlayer(redId), blue = server
 					.getPlayer(blueId);
 			if (red == null && blue != null) {
@@ -211,10 +211,14 @@ public class ArenaManager {
 		String redName = red.getName(), blueName = blue.getName();
 		red.teleport(redSpawn);
 		blue.teleport(blueSpawn);
-		if (!red.isDead())
+		if (!red.isDead()) {
+			red.setFoodLevel(20);
 			red.setHealth(red.getMaxHealth());
-		if (!blue.isDead())
+		}
+		if (!blue.isDead()) {
+			red.setFoodLevel(20);
 			blue.setHealth(blue.getMaxHealth());
+		}
 		// Temporary solution
 		Server server = sm.getServer();
 		ConsoleCommandSender cs = server.getConsoleSender();
@@ -244,10 +248,14 @@ public class ArenaManager {
 		loser.teleport(warp);
 		winner.setFireTicks(0);
 		loser.setFireTicks(0);
-		if (!winner.isDead())
+		if (!winner.isDead()) {
+			winner.setFoodLevel(20);
 			winner.setHealth(winner.getMaxHealth());
-		if (!loser.isDead())
+		}
+		if (!loser.isDead()) {
+			loser.setFoodLevel(20);
 			loser.setHealth(loser.getMaxHealth());
+		}
 		server.broadcastMessage(ChatColor.GOLD + winnerName + ChatColor.GRAY
 				+ " has defeated " + ChatColor.GOLD + loserName
 				+ ChatColor.GRAY + " in the arena.");
@@ -259,7 +267,7 @@ public class ArenaManager {
 		}, 60);
 	}
 
-	public void quit(Player player) {
+	public void quit(Player player, boolean sendMessage) {
 		if (red.equals(player)) {
 			endMatch(blue, red);
 		} else if (blue.equals(player)) {
@@ -287,14 +295,18 @@ public class ArenaManager {
 										ChatColor.GOLD
 												+ player.getName()
 												+ " has quit. You are removed from the queue.");
-						player.sendMessage(ChatColor.GOLD
-								+ "You have been remove from the queue");
+						if (sendMessage) {
+							player.sendMessage(ChatColor.GOLD
+									+ "You have been remove from the queue");
+						}
 						break;
 					}
 				}
 			} else {
-				player.sendMessage(ChatColor.RED
-						+ "Theres nothing for you to quit.");
+				if (sendMessage) {
+					player.sendMessage(ChatColor.RED
+							+ "Theres nothing for you to quit.");
+				}
 			}
 		}
 	}
@@ -311,10 +323,14 @@ public class ArenaManager {
 		blue.teleport(warp);
 		red.setFireTicks(0);
 		blue.setFireTicks(0);
-		if (!red.isDead())
+		if (!red.isDead()) {
+			red.setFoodLevel(20);
 			red.setHealth(red.getMaxHealth());
-		if (!blue.isDead())
+		}
+		if (!blue.isDead()) {
+			blue.setFoodLevel(20);
 			blue.setHealth(blue.getMaxHealth());
+		}
 		server.broadcastMessage(ChatColor.GOLD + "The arena has been reset.");
 		this.red = null;
 		this.blue = null;
@@ -338,13 +354,19 @@ public class ArenaManager {
 		blue.teleport(warp);
 		red.setFireTicks(0);
 		blue.setFireTicks(0);
-		if (!red.isDead())
+		if (!red.isDead()) {
+			red.setFoodLevel(20);
 			red.setHealth(red.getMaxHealth());
-		if (!blue.isDead())
+		}
+		if (!blue.isDead()) {
+			blue.setFoodLevel(20);
 			blue.setHealth(blue.getMaxHealth());
+		}
 		this.red = null;
 		this.blue = null;
 		active = false;
+		queue = new LinkedList<Match>();
+		queued = new LinkedList<UUID>();
 		server.broadcastMessage(ChatColor.GOLD
 				+ "The arena has been reset, and the queue emptied.");
 	}

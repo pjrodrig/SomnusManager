@@ -31,7 +31,7 @@ public class MatchListener implements Listener {
 		}
 		if (isRed || ent.equals(blue)) {
 			Player player = (Player) ent;
-			double damage = event.getDamage(), health = player.getHealth();
+			double damage = event.getFinalDamage(), health = player.getHealth();
 			if (damage >= health) {
 				event.setCancelled(true);
 				if (isRed)
@@ -48,7 +48,12 @@ public class MatchListener implements Listener {
 	@EventHandler
 	public void death(PlayerDeathEvent event) {
 		Player player = event.getEntity();
-		if (player.equals(red) || player.equals(blue)) {
+		if (player.equals(red)) {
+			am.endMatch(blue, red);
+			event.setKeepInventory(true);
+			event.setKeepLevel(true);
+		} else if (player.equals(blue)) {
+			am.endMatch(red, blue);
 			event.setKeepInventory(true);
 			event.setKeepLevel(true);
 		}
