@@ -10,7 +10,7 @@ import com.yahoo.prosfis.somnusmanager.arena.ArenaManager;
 import com.yahoo.prosfis.somnusmanager.arena.listeners.ArenaListener;
 
 public class SomnusManager extends JavaPlugin {
-	
+
 	private ArenaManager am;
 
 	public void onEnable() {
@@ -21,19 +21,19 @@ public class SomnusManager extends JavaPlugin {
 	public void onDisable() {
 		getLogger().info("SomnusManager is disabled.");
 	}
-	
-	public void init(){
+
+	public void init() {
 		this.am = new ArenaManager(this);
 		assignCommands();
 		registerListeners();
 	}
-	
-	public void assignCommands(){
+
+	public void assignCommands() {
 		ArenaCommandExecutor ace = new ArenaCommandExecutor(am);
 		getCommand("arena").setExecutor(ace);
 	}
-	
-	public void registerListeners(){
+
+	public void registerListeners() {
 		PluginManager pm = getServer().getPluginManager();
 		pm.registerEvents(new ArenaListener(am), this);
 	}
