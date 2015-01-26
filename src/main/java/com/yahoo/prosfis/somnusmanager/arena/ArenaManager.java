@@ -268,9 +268,9 @@ public class ArenaManager {
 	}
 
 	public void quit(Player player, boolean sendMessage) {
-		if (red.equals(player)) {
+		if (red != null && red.equals(player)) {
 			endMatch(blue, red);
-		} else if (blue.equals(player)) {
+		} else if (blue != null && blue.equals(player)) {
 			endMatch(red, blue);
 		} else {
 			UUID id = player.getUniqueId();
