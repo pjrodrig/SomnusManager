@@ -21,16 +21,51 @@ public class MarriageManager {
 	private FileConfiguration marriageConfig = null;
 	private File marriageConfigFile = null;
 
+	private final Map<UUID, UUID> proposals;
 	private final Map<UUID, Couple> marriages;
 	private final SomnusManager sm;
 
 	public MarriageManager(SomnusManager sm) {
 		this.sm = sm;
 		this.marriages = Maps.newHashMap();
+		this.proposals = Maps.newHashMap();
 	}
-	
-	public void propose(Player proposer, Player proposee){
-		
+
+	public void propose(Player proposer, Player proposee) {
+		UUID proposerId = proposer.getUniqueId(), proposeeId = proposee
+				.getUniqueId();
+		if (marriages.containsKey(proposerId)) {
+			proposer.sendMessage(ChatColor.RED
+					+ "You are already married. Use '/divorce' to divorce.");
+		} else if (marriages.containsKey(proposeeId)) {
+			proposer.sendMessage(ChatColor.RED
+					+ "That player is already married.");
+		} else {
+			if (proposals.containsKey(proposeeId)) {
+				if (proposals.get(proposeeId).equals(proposerId)) {
+					proposer.sendMessage(ChatColor.RED
+							+ "You have already proposed to this player.");
+					proposer.sendMessage(ChatColor.RED
+							+ "You must wait to propose again.");
+				}
+			} else {
+				addProposal(proposer, proposerId, proposee, proposeeId);
+			}
+		}
+	}
+
+	private void addProposal(Player proposer, final UUID proposerId, Player proposee,
+			final UUID proposeeId) {
+		proposer.sendMessage(ChatColor.GRAY + "You have proposed to "
+				+ ChatColor.LIGHT_PURPLE + proposee.getName() + ChatColor.GRAY + ".");
+		proposee.sendMessage(ChatColor.LIGHT_PURPLE + proposer.getName() + ChatColor.GRAY + " has proposed to you.");
+		proposals.put(proposeeId, proposerId);
+		sm.getServer().getScheduler().runTaskLater(sm, new Runnable(){
+			public void run(){
+				if(proposals.containsKey(proposeeId) && proposals.get(proposeeId).equals(proposerId))
+					proposals.remove(proposeeId);
+			}
+		}, 20 * 10);
 	}
 
 	public void marry(Player p1, Player p2) {
