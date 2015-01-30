@@ -260,6 +260,7 @@ public class MarriageManager {
 			Couple couple = marriages.get(id);
 			couple.setHome(player.getLocation());
 			saveCouple(couple);
+			player.sendMessage(ChatColor.LIGHT_PURPLE + "Home set.");
 		} else
 			player.sendMessage(ChatColor.RED + "You are not married to anyone.");
 	}
