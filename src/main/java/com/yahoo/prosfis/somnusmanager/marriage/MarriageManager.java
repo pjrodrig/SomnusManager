@@ -33,7 +33,7 @@ public class MarriageManager {
 	private final Map<UUID, MarriageChatListener> chats;
 	private final SomnusManager sm;
 	private Status status;
-	private Location p1Loc, p2Loc, priestLoc;
+	private Location warp, p1Loc, p2Loc, priestLoc;
 	private Player p1, p2, priest;
 	private LogoutListener logoutListener;
 	private IDoListener iDoListener;
@@ -49,6 +49,7 @@ public class MarriageManager {
 
 	public void init() {
 		FileConfiguration config = getMarriageConfig();
+		warp = ConfigUtil.loadLocation(sm.getServer(), config, "Church.Warp.");
 		priestLoc = ConfigUtil.loadLocation(sm.getServer(), config,
 				"Church.Priest.");
 		p1Loc = ConfigUtil.loadLocation(sm.getServer(), config, "Church.P1.");
@@ -86,6 +87,12 @@ public class MarriageManager {
 		saveMarriageConfig();
 	}
 
+	public void setChurch(Location loc) {
+		warp = loc;
+		ConfigUtil.saveLocation(getMarriageConfig(), "Church.Warp.", loc);
+		saveMarriageConfig();
+	}
+
 	public void setPriest(Location loc) {
 		priestLoc = loc;
 		ConfigUtil.saveLocation(getMarriageConfig(), "Church.Priest.", loc);
@@ -102,6 +109,10 @@ public class MarriageManager {
 		p1Loc = loc;
 		ConfigUtil.saveLocation(getMarriageConfig(), "Church.P2.", loc);
 		saveMarriageConfig();
+	}
+
+	public void warp(Player player) {
+		player.teleport(warp);
 	}
 
 	public void propose(Player proposer, Player proposee) {
