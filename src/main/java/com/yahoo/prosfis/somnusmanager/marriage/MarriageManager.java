@@ -87,27 +87,30 @@ public class MarriageManager {
 		saveMarriageConfig();
 	}
 
-	public void setChurch(Location loc) {
-		warp = loc;
-		ConfigUtil.saveLocation(getMarriageConfig(), "Church.Warp.", loc);
+	public void setChurch(Player player) {
+		warp = player.getLocation();
+		ConfigUtil.saveLocation(getMarriageConfig(), "Church.Warp.", warp);
+		saveMarriageConfig();
+		player.sendMessage(ChatColor.GREEN + "Warp set");
+	}
+
+	public void setPriest(Player player) {
+		priestLoc = player.getLocation();
+		ConfigUtil.saveLocation(getMarriageConfig(), "Church.Priest.",
+				priestLoc);
+		saveMarriageConfig();
+		player.sendMessage(ChatColor.GREEN + "Location set");
+	}
+
+	public void setPlayer1(Player player) {
+		p1Loc = player.getLocation();
+		ConfigUtil.saveLocation(getMarriageConfig(), "Church.P1.", p1Loc);
 		saveMarriageConfig();
 	}
 
-	public void setPriest(Location loc) {
-		priestLoc = loc;
-		ConfigUtil.saveLocation(getMarriageConfig(), "Church.Priest.", loc);
-		saveMarriageConfig();
-	}
-
-	public void setPlayer1(Location loc) {
-		p1Loc = loc;
-		ConfigUtil.saveLocation(getMarriageConfig(), "Church.P1.", loc);
-		saveMarriageConfig();
-	}
-
-	public void setPlayer2(Location loc) {
-		p1Loc = loc;
-		ConfigUtil.saveLocation(getMarriageConfig(), "Church.P2.", loc);
+	public void setPlayer2(Player player) {
+		p1Loc = player.getLocation();
+		ConfigUtil.saveLocation(getMarriageConfig(), "Church.P2.", p2Loc);
 		saveMarriageConfig();
 	}
 
