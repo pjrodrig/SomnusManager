@@ -10,6 +10,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.scheduler.BukkitTask;
 
 import com.yahoo.prosfis.somnusmanager.SomnusManager;
 import com.yahoo.prosfis.somnusmanager.marriage.MarriageManager;
@@ -22,9 +23,10 @@ public class IDoListener implements Listener {
 	private final Player p1, p2, priest;
 	private Player turn;
 	private boolean listen, first;
+	private BukkitTask timer;
 
 	public IDoListener(final Player p1, final Player p2, final Player priest,
-			Location loc, MarriageManager mm, SomnusManager sm) {
+			Location loc, final MarriageManager mm, final SomnusManager sm) {
 		this.sm = sm;
 		this.mm = mm;
 		this.p1 = p1;
@@ -33,7 +35,7 @@ public class IDoListener implements Listener {
 		this.loc = loc;
 		listen = false;
 		first = true;
-		Server server = sm.getServer();
+		final Server server = sm.getServer();
 		server.broadcastMessage(ChatColor.GRAY + priest.getName() + ": "
 				+ ChatColor.GRAY + "The wedding will commence in one minute.");
 		server.getScheduler().runTaskLater(sm, new Runnable() {
@@ -43,6 +45,15 @@ public class IDoListener implements Listener {
 						+ " to be your life long partner in marriage?");
 				turn = p1;
 				listen = true;
+				timer = server.getScheduler().runTaskLater(sm, new Runnable() {
+					public void run() {
+						server.broadcastMessage(ChatColor.LIGHT_PURPLE
+								+ p1.getName()
+								+ "failed to say 'I do'. The wedding was canceled.");
+						mm.cancelWedding();
+						timer = null;
+					}
+				}, 20 * 20);
 			}
 		}, 20 * 60);
 	}
@@ -69,6 +80,7 @@ public class IDoListener implements Listener {
 	}
 
 	private void next() {
+		timer.cancel();
 		if (first) {
 			turn = p2;
 			first = false;
@@ -76,6 +88,16 @@ public class IDoListener implements Listener {
 					+ ChatColor.YELLOW + "..and do you, " + p2.getName()
 					+ ", take " + p1.getName()
 					+ " to be your life long partner in marriage?");
+			final Server server = sm.getServer();
+			timer = server.getScheduler().runTaskLater(sm, new Runnable() {
+				public void run() {
+					server.broadcastMessage(ChatColor.LIGHT_PURPLE
+							+ p2.getName()
+							+ "failed to say 'I do'. The wedding was canceled.");
+					mm.cancelWedding();
+					timer = null;
+				}
+			}, 20 * 30);
 		} else {
 			mm.marry(p1, p2);
 			unregister();

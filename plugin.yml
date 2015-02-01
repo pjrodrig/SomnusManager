@@ -3,16 +3,45 @@ main: com.yahoo.prosfis.somnusmanager.SomnusManager
 version: 1.0.0
 
 commands:
-     arena:
+    arena:
         description: All arena commands
-        usage: /<command> help
-        permission: SomnusManager.arena
+        usage: /arena help
+        permission: SomnusManager.default
         permission-message: You do not have <permission>
+    marry:
+        description: All marriage commands
+        usage: /marry help
+        permission: SomnusManager.default
+    church:
+        description: Teleport to church
+        usage: /marry help
+        permission: SomnusManager.default
+    propose:
+        description: Propose to a player
+        usage: /marry help
+        permission: SomnusManager.default
+    divorce:
+        description: Divorce your spouse
+        usage: /marry help
+        permission: SomnusManager.default
+    addpriest:
+        description: All marriage commands
+        usage: /<command> player
+        permission: SomnusManager.consoleOnly
 permissions:
     SomnusManager.*:
         description: Gives access to all SomnusManager commands.
         children:
+            SomnusManager.admin: true;
+            SomnusManager.default: true
+    SomnusManager.default:
+        description: The default permission for SomnusManager.
+        children:
             SomnusManager.arena: true
-    SomnusManager.arena:
-        description: All arena commands
+            SomnusManager.marriage: true
+    SomnusManager.default:
+        description: All default commands for SomnusManager
         default: true
+    SomnusManager.admin:
+        description: Admin permission for SomnusManager
+        default: op
