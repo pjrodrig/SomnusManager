@@ -8,6 +8,7 @@ commands:
         usage: /arena help
         permission: SomnusManager.default
         permission-message: You do not have <permission>
+<<<<<<< HEAD
      qw:
         description: All quick warp commands
         usage: /<command> help
@@ -54,26 +55,28 @@ commands:
      staff:
         permission: SomnusManager.staffHelp
         permission-message: You do not have <permission>
-     marry:
+=======
+    marry:
         description: All marriage commands
         usage: /marry help
         permission: SomnusManager.default
-     church:
+    church:
         description: Teleport to church
         usage: /marry help
         permission: SomnusManager.default
-     propose:
+    propose:
         description: Propose to a player
         usage: /marry help
         permission: SomnusManager.default
-     divorce:
+    divorce:
         description: Divorce your spouse
         usage: /marry help
         permission: SomnusManager.default
-     addpriest:
+    addpriest:
         description: All marriage commands
         usage: /<command> player
         permission: SomnusManager.consoleOnly
+>>>>>>> Finished? implementing command executor
 permissions:
     SomnusManager.*:
         description: Gives access to all SomnusManager commands.
@@ -84,17 +87,18 @@ permissions:
         description: The default permission for SomnusManager.
         children:
             SomnusManager.arena: true
+<<<<<<< HEAD
             SomnusManager.qw: true
             SomnusManager.random: true
     SomnusManager.staff:
         description: Staff commands
         default: op
-            SomnusManager.marriage: true
-    SomnusManager.default:
-        description: All default commands for SomnusManager
     SomnusManager.admin:
         description: Admin commands
         default: op
+    SomnusManager.arena:
+        description: All arena commands
+        default: true
     SomnusManager.qw:
         description: All quick warp commands
         default: op
@@ -104,6 +108,12 @@ permissions:
     SomnusManager.staffHelp:
         description: Request staff help
         default: true
+=======
+            SomnusManager.marriage: true
+    SomnusManager.default:
+        description: All default commands for SomnusManager
+        default: true
     SomnusManager.admin:
         description: Admin permission for SomnusManager
         default: op
+>>>>>>> Finished? implementing command executor

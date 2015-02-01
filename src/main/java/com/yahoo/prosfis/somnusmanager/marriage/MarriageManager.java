@@ -15,6 +15,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitTask;
 
 import com.google.common.collect.Maps;
 import com.yahoo.prosfis.somnusmanager.SomnusManager;
@@ -37,6 +38,7 @@ public class MarriageManager {
 	private Player p1, p2, priest;
 	private LogoutListener logoutListener;
 	private IDoListener iDoListener;
+	private BukkitTask timer;
 
 	public MarriageManager(SomnusManager sm) {
 		this.sm = sm;
@@ -197,7 +199,7 @@ public class MarriageManager {
 	}
 
 	private void getPriest() {
-		Server server = sm.getServer();
+		final Server server = sm.getServer();
 		server.broadcastMessage(ChatColor.LIGHT_PURPLE + p1.getName()
 				+ ChatColor.GRAY + " and " + ChatColor.LIGHT_PURPLE
 				+ p2.getName() + ChatColor.GRAY
@@ -205,12 +207,45 @@ public class MarriageManager {
 		server.broadcastMessage(ChatColor.GRAY
 				+ "Is there a priest who will marry them? Use "
 				+ ChatColor.LIGHT_PURPLE + "/marry priest ");
+		timer = server.getScheduler().runTaskLater(sm, new Runnable() {
+			public void run() {
+				server.broadcastMessage(ChatColor.LIGHT_PURPLE
+						+ "No priest was found. The wedding was canceled.");
+				cancelWedding();
+				timer = null;
+			}
+		}, 20 * 30);
+	}
+	
+	public void cancelWedding(){
+		p1 = null;
+		p2 = null;
+		priest = null;
+		if(logoutListener != null){
+			logoutListener.unregister();
+			logoutListener = null;
+		}
+		if(iDoListener != null){
+			iDoListener.unregister();
+			iDoListener = null;
+		}
+		if(timer != null){
+			timer.cancel();
+			timer = null;
+		}
+		status = Status.OPEN;
 	}
 
 	public void addPriest(Player player) {
 		if (status == Status.PLANNING) {
-			logoutListener.unregister();
-			startWedding();
+			if (p1.equals(player) || p2.equals(player)) {
+				player.sendMessage(ChatColor.RED
+						+ "You cannot host your own wedding.");
+			} else {
+				logoutListener.unregister();
+				priest = player;
+				startWedding();
+			}
 		} else {
 			player.sendMessage(ChatColor.RED
 					+ "There are no pending marriages at this time.");
