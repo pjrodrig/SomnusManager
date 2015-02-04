@@ -78,7 +78,7 @@ permissions:
     SomnusManager.*:
         description: Gives access to all SomnusManager commands.
         children:
-            SomnusManager.admin: true;
+            SomnusManager.admin: true
             SomnusManager.default: true
     SomnusManager.default:
         description: The default permission for SomnusManager.
