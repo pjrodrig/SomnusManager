@@ -39,8 +39,10 @@ public class MatchListener implements Listener {
 				else
 					am.endMatch(red, blue);
 			} else {
-				event.setDamage(.5);
-				player.setHealth(health - (damage - .5));
+				if (damage > 1) {
+					event.setDamage(.5);
+					player.setHealth(health - (damage - .5));
+				}
 			}
 		}
 	}

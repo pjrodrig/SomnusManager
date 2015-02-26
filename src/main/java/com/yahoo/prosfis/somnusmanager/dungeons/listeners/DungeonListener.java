@@ -28,17 +28,20 @@ public class DungeonListener implements Listener {
 		}
 	}
 
-	@EventHandler(ignoreCancelled = true)
-	public void takeDamage(EntityDamageEvent event) {
-		Entity ent = event.getEntity();
-		if (ent instanceof Player
-				&& ent.getWorld().getName().equalsIgnoreCase("Dungeon")) {
-			Player player = (Player) ent;
-			double damage = event.getFinalDamage(), health = player.getHealth();
-			if (damage >= health)
-				damage = health;
-			player.setHealth(health - (damage - .5));
-			event.setDamage(.5);
-		}
-	}
+//	@EventHandler(ignoreCancelled = true)
+//	public void takeDamage(EntityDamageEvent event) {
+//		Entity ent = event.getEntity();
+//		if (ent instanceof Player
+//				&& ent.getWorld().getName().equalsIgnoreCase("Dungeon")) {
+//			Player player = (Player) ent;
+//			double damage = event.getFinalDamage(), health = player.getHealth();
+//			ItemStack[] armor = player.getInventory().getArmorContents();
+//			if (damage > 2) {
+//				if (damage >= health)
+//					damage = health;
+//				event.setDamage(1);
+//				player.setHealth(health - (damage - 1));
+//			}
+//		}
+//	}
 }
