@@ -9,6 +9,7 @@ import com.yahoo.prosfis.somnusmanager.arena.ArenaCommandExecutor;
 import com.yahoo.prosfis.somnusmanager.arena.ArenaManager;
 import com.yahoo.prosfis.somnusmanager.arena.listeners.ArenaListener;
 import com.yahoo.prosfis.somnusmanager.dungeons.listeners.DungeonListener;
+import com.yahoo.prosfis.somnusmanager.fireprotect.FireProtectListener;
 
 public class SomnusManager extends JavaPlugin {
 
@@ -38,6 +39,7 @@ public class SomnusManager extends JavaPlugin {
 		PluginManager pm = getServer().getPluginManager();
 		pm.registerEvents(new ArenaListener(am), this);
 		pm.registerEvents(new DungeonListener(), this);
+		pm.registerEvents(new FireProtectListener(this), this);
 	}
 
 	public boolean onCommand(CommandSender sender, Command cmd, String label,
