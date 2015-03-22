@@ -2,11 +2,9 @@ package com.yahoo.prosfis.somnusmanager.dungeons.listeners;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -28,7 +26,7 @@ public class DungeonListener implements Listener {
 		}
 	}
 
-//	@EventHandler(ignoreCancelled = true)
+//	@EventHandler(ignoreCancelled = true, priority = EventPriorirty.High)
 //	public void takeDamage(EntityDamageEvent event) {
 //		Entity ent = event.getEntity();
 //		if (ent instanceof Player

@@ -29,7 +29,6 @@ public class ArenaListener implements Listener {
 					|| item == Material.DIAMOND_SWORD) {
 				am.challenge(challenger, (Player) ent);
 			}
-			event.setCancelled(true);
 		}
 	}
 

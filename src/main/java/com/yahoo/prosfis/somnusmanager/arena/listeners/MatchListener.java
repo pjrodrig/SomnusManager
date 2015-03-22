@@ -4,6 +4,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -22,7 +23,7 @@ public class MatchListener implements Listener {
 		this.blue = blue;
 	}
 
-	@EventHandler
+	@EventHandler(priority = EventPriority.HIGH)
 	public void takeDamage(EntityDamageEvent event) {
 		Entity ent = event.getEntity();
 		boolean isRed = false;
@@ -47,7 +48,7 @@ public class MatchListener implements Listener {
 		}
 	}
 
-	@EventHandler
+	@EventHandler(priority = EventPriority.HIGH)
 	public void death(PlayerDeathEvent event) {
 		Player player = event.getEntity();
 		if (player.equals(red)) {
