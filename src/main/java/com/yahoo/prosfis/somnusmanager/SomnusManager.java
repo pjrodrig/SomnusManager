@@ -1,12 +1,17 @@
 package com.yahoo.prosfis.somnusmanager;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.logging.Level;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -15,12 +20,15 @@ import com.yahoo.prosfis.somnusmanager.arena.ArenaManager;
 import com.yahoo.prosfis.somnusmanager.arena.listeners.ArenaListener;
 import com.yahoo.prosfis.somnusmanager.dungeons.listeners.DungeonListener;
 import com.yahoo.prosfis.somnusmanager.fireprotect.FireProtectListener;
+import com.yahoo.prosfis.somnusmanager.joinprotect.BlockChangeListener;
 
 public class SomnusManager extends JavaPlugin {
 
 	private ArenaManager am;
 	private Connection connection;
 	private String ip, port, dbName, username, password;
+	private FileConfiguration somnusPlayers = null;
+	private File somnusPlayersFile = null;
 
 	public void onEnable() {
 		getLogger().info("SomnusManager is enabled.");
@@ -49,6 +57,7 @@ public class SomnusManager extends JavaPlugin {
 		pm.registerEvents(new ArenaListener(am), this);
 		pm.registerEvents(new DungeonListener(), this);
 		pm.registerEvents(new FireProtectListener(this), this);
+		pm.registerEvents(new BlockChangeListener(this), this);
 	}
 
 	public boolean onCommand(CommandSender sender, Command cmd, String label,
@@ -82,10 +91,13 @@ public class SomnusManager extends JavaPlugin {
 			ResultSet rs = connection.createStatement().executeQuery(
 					"SHOW TABLES LIKE 'block_changes'");
 			if (!rs.next()) {
-				getConnection().createStatement().execute(
-						"CREATE TABLE block_changes (uuid VARCHAR(40), world "
-								+ "VARCHAR(20), x INTEGER, y INTEGER, z "
-								+ "INTEGER)");
+				getConnection()
+						.createStatement()
+						.execute(
+								"CREATE TABLE block_changes (uuid VARCHAR(40), world "
+										+ "VARCHAR(20), block_x INTEGER, block_y INTEGER, block_z "
+										+ "INTEGER, chunk_x INTEGER, chunk_z "
+										+ "INTEGER)");
 			}
 		} catch (SQLException e) {
 			getLogger().warning(e.getMessage());
@@ -103,6 +115,54 @@ public class SomnusManager extends JavaPlugin {
 			getServer().getLogger().info(e.getMessage());
 		}
 		return connection;
+	}
+
+	/*
+	 * Reloads somnusPlayers.yml
+	 * 
+	 * @ensure playerClassFile != null
+	 */
+	public void reloadSomnusPlayers() {
+		if (somnusPlayersFile == null) {
+			somnusPlayersFile = new File(getDataFolder(), "somnusPlayers.yml");
+		}
+		somnusPlayers = YamlConfiguration.loadConfiguration(somnusPlayersFile);
+
+		// Look for defaults in the jar
+		InputStream defConfigStream = getResource("somnusPlayers.yml");
+		if (defConfigStream != null) {
+			@SuppressWarnings("deprecation")
+			YamlConfiguration defConfig = YamlConfiguration
+					.loadConfiguration(defConfigStream);
+			somnusPlayers.setDefaults(defConfig);
+		}
+	}
+
+	/*
+	 * Reads somnusPlayers.yml
+	 * 
+	 * @ensure returns somnusPlayers file config
+	 */
+	public FileConfiguration getSomnusPlayers() {
+		if (somnusPlayers == null) {
+			reloadSomnusPlayers();
+		}
+		return somnusPlayers;
+	}
+
+	/*
+	 * Writes to somnusPlayers.yml
+	 */
+	public void saveSomnusPlayers() {
+		if (somnusPlayers == null || somnusPlayersFile == null) {
+			return;
+		}
+		try {
+			getSomnusPlayers().save(somnusPlayersFile);
+		} catch (IOException ex) {
+			getLogger().log(Level.SEVERE,
+					"Could not save config to " + somnusPlayersFile, ex);
+		}
 	}
 
 }
