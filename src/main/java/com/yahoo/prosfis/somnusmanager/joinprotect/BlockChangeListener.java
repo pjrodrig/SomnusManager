@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -32,6 +33,24 @@ public class BlockChangeListener implements Listener {
 	public BlockChangeListener(SomnusManager sm) {
 		this.sm = sm;
 		this.newPlayers = Maps.newHashMap();
+		init();
+	}
+
+	private void init() {
+		UUID id;
+		for (Player player : sm.getServer().getOnlinePlayers()) {
+			id = player.getUniqueId();
+			FileConfiguration config = sm.getSomnusPlayers();
+			boolean firstJoin = false;
+			if (!config.contains(id.toString())) {
+				firstJoin = true;
+				config.set(id + ".New", true);
+				sm.saveSomnusPlayers();
+			}
+			if (firstJoin || config.getBoolean(id + ".New")) {
+				newPlayers.put(id, (new Date().getTime() / 60000));
+			}
+		}
 	}
 
 	@EventHandler
@@ -41,29 +60,29 @@ public class BlockChangeListener implements Listener {
 		boolean firstJoin = false;
 		if (!config.contains(id.toString())) {
 			firstJoin = true;
-			config.set(id + ".New", MetadataUtil.makeSimpleCallable(true, sm));
+			config.set(id + ".New", true);
+			sm.saveSomnusPlayers();
 		}
 		if (firstJoin || config.getBoolean(id + ".New")) {
-			newPlayers.put(id, (new Date().getTime() / 3600000));
+			newPlayers.put(id, (new Date().getTime() / 60000));
 		}
 	}
 
 	@EventHandler
 	public void logout(PlayerQuitEvent event) {
 		UUID id = event.getPlayer().getUniqueId();
-		FileConfiguration config = sm.getSomnusPlayers();
 		if (newPlayers.containsKey(id)) {
+			FileConfiguration config = sm.getSomnusPlayers();
 			float time = config.getLong(id + ".PlayTime");
-			time += newPlayers.get(id) - (new Date().getTime() / 3600000);
-			if (time > 10) {
-				config.set(id + "New",
-						MetadataUtil.makeSimpleCallable(false, sm));
+			time += (new Date().getTime() / 60000) - newPlayers.get(id);
+			if (time > 600) {
+				config.set(id + ".New", false);
 				config.set(id + ".PlayTime", null);
 				newPlayers.remove(id);
 			} else {
-				config.set(id + ".PlayTime",
-						MetadataUtil.makeSimpleCallable(time, sm));
+				config.set(id + ".PlayTime", time);
 			}
+			sm.saveSomnusPlayers();
 		}
 	}
 
@@ -78,12 +97,10 @@ public class BlockChangeListener implements Listener {
 							.getConnection()
 							.createStatement()
 							.executeQuery(
-									"SELECT * FROM block_changes WHERE world ='"
+									"SELECT * FROM sm_block_changes WHERE world ='"
 											+ chunk.getWorld().getName()
-											+ "' AND chunk_x = ("
-											+ chunk.getX()
-											+ ") AND chunk_z = ("
-											+ chunk.getZ());
+											+ "' AND chunk_x = " + chunk.getX()
+											+ " AND chunk_z = " + chunk.getZ());
 					Block block;
 					while (rs.next()) {
 						block = world.getBlockAt(rs.getInt("block_x"),
@@ -107,14 +124,17 @@ public class BlockChangeListener implements Listener {
 			Player player = event.getPlayer();
 			UUID id = player.getUniqueId();
 			if (!newPlayers.containsKey(id)
-					|| id.equals(block.getMetadata("SomnusPlayer"))) {
+					|| id.toString()
+							.equals(block.getMetadata("SomnusPlayer").get(0)
+									.asString())) {
+				block.removeMetadata("SomnusPlayer", sm);
 				new Thread(new Runnable() {
 					public void run() {
 						try {
 							sm.getConnection()
 									.createStatement()
 									.executeUpdate(
-											"DELETE FROM block_changes WHERE world = '"
+											"DELETE FROM sm_block_changes WHERE world = '"
 													+ block.getWorld()
 															.getName()
 													+ "' AND block_x = "
@@ -128,6 +148,9 @@ public class BlockChangeListener implements Listener {
 						}
 					}
 				}).start();
+			} else {
+				player.sendMessage(ChatColor.RED
+						+ "You cannot break blocks placed by other players yet.");
 			}
 		}
 	}
@@ -146,7 +169,7 @@ public class BlockChangeListener implements Listener {
 					sm.getConnection()
 							.createStatement()
 							.execute(
-									"INSERT INTO block_changes(uuid, world, block_x, block_y, block_z, chunk_x, chunk_z) VALUES('"
+									"REPLACE INTO sm_block_changes(uuid, world, block_x, block_y, block_z, chunk_x, chunk_z) VALUES('"
 											+ id
 											+ "', '"
 											+ loc.getWorld().getName()

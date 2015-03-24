@@ -89,15 +89,15 @@ public class SomnusManager extends JavaPlugin {
 	public void checkTables() {
 		try {
 			ResultSet rs = connection.createStatement().executeQuery(
-					"SHOW TABLES LIKE 'block_changes'");
+					"SHOW TABLES LIKE 'sm_block_changes'");
 			if (!rs.next()) {
 				getConnection()
 						.createStatement()
 						.execute(
-								"CREATE TABLE block_changes (uuid VARCHAR(40), world "
+								"CREATE TABLE sm_block_changes (uuid VARCHAR(40), world "
 										+ "VARCHAR(20), block_x INTEGER, block_y INTEGER, block_z "
 										+ "INTEGER, chunk_x INTEGER, chunk_z "
-										+ "INTEGER)");
+										+ "INTEGER,  UNIQUE KEY unique_block (world, block_x, block_y, block_z))");
 			}
 		} catch (SQLException e) {
 			getLogger().warning(e.getMessage());
