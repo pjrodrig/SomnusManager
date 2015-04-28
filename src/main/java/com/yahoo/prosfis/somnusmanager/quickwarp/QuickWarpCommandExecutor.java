@@ -43,7 +43,7 @@ public class QuickWarpCommandExecutor implements CommandExecutor {
 					break;
 				case "list":
 					if (args.length == 1) {
-						qwm.getList((Player) sender);
+						qwm.printList((Player) sender);
 					} else {
 						sender.sendMessage(ChatColor.RED + "/qw help");
 					}

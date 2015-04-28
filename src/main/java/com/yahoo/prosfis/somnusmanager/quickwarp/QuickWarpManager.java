@@ -129,7 +129,7 @@ public class QuickWarpManager {
 		saveQuickWarpConfig();
 	}
 
-	public String getList(Player player) {
+	public void printList(Player player) {
 		String names = "", current;
 		Iterator<String> iter = warps.keySet().iterator();
 		boolean first = true;
@@ -141,7 +141,7 @@ public class QuickWarpManager {
 				names = names + ", ";
 			names = names + current;
 		}
-		return names;
+		player.sendMessage(names);
 	}
 
 	/*
