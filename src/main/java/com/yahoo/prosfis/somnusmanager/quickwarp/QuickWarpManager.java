@@ -54,7 +54,6 @@ public class QuickWarpManager {
 				Location destination = warp.getDestination();
 				if (destination != null)
 					qwListener.addWarp(warp.getLocation(), destination);
-				sm.getServer().broadcastMessage(warp.getDestination() + "");
 				warp.start();
 			}
 		}
@@ -108,7 +107,9 @@ public class QuickWarpManager {
 
 	public void remove(Player player, String warp) {
 		if (warps.containsKey(warp)) {
-			qwListener.removeWarp(warps.get(warp).getLocation());
+			QuickWarp qwarp = warps.get(warp);
+			qwarp.stop();
+			qwListener.removeWarp(qwarp.getLocation());
 			warps.remove(warp);
 			getQuickWarpConfig().set("Warps." + warp, null);
 			saveQuickWarpConfig();
