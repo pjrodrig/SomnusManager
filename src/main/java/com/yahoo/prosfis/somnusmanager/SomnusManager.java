@@ -21,10 +21,13 @@ import com.yahoo.prosfis.somnusmanager.arena.listeners.ArenaListener;
 import com.yahoo.prosfis.somnusmanager.dungeons.listeners.DungeonListener;
 import com.yahoo.prosfis.somnusmanager.fireprotect.FireProtectListener;
 import com.yahoo.prosfis.somnusmanager.joinprotect.BlockChangeListener;
+import com.yahoo.prosfis.somnusmanager.quickwarp.QuickWarpCommandExecutor;
+import com.yahoo.prosfis.somnusmanager.quickwarp.QuickWarpManager;
 
 public class SomnusManager extends JavaPlugin {
 
 	private ArenaManager am;
+	private QuickWarpManager qwm;
 	private Connection connection;
 	private String ip, port, dbName, username, password;
 	private FileConfiguration somnusPlayers = null;
@@ -41,6 +44,7 @@ public class SomnusManager extends JavaPlugin {
 
 	public void init() {
 		this.am = new ArenaManager(this);
+		this.qwm = new QuickWarpManager(this);
 		assignCommands();
 		registerListeners();
 		openConnection();
@@ -50,6 +54,8 @@ public class SomnusManager extends JavaPlugin {
 	public void assignCommands() {
 		ArenaCommandExecutor ace = new ArenaCommandExecutor(am);
 		getCommand("arena").setExecutor(ace);
+		QuickWarpCommandExecutor qwce = new QuickWarpCommandExecutor(qwm);
+		getCommand("qw").setExecutor(qwce);
 	}
 
 	public void registerListeners() {
@@ -60,8 +66,7 @@ public class SomnusManager extends JavaPlugin {
 		pm.registerEvents(new BlockChangeListener(this), this);
 	}
 
-	public boolean onCommand(CommandSender sender, Command cmd, String label,
-			String[] args) {
+	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		String command = cmd.getName();
 		if (command.equalsIgnoreCase("----")) {
 		}
@@ -69,8 +74,7 @@ public class SomnusManager extends JavaPlugin {
 	}
 
 	public void openConnection() {
-		if (ip == null || port == null || dbName == null || username == null
-				|| password == null) {
+		if (ip == null || port == null || dbName == null || username == null || password == null) {
 			FileConfiguration config = getConfig();
 			ip = config.getString("DataBase.IP");
 			port = config.getString("DataBase.Port");
@@ -79,8 +83,7 @@ public class SomnusManager extends JavaPlugin {
 			password = config.getString("DataBase.Password");
 		}
 		try {
-			connection = new DBConnection(ip, port, dbName, username, password)
-					.getConnection();
+			connection = new DBConnection(ip, port, dbName, username, password).getConnection();
 		} catch (Exception e) {
 			getServer().getLogger().info(e.getMessage());
 		}
@@ -132,8 +135,7 @@ public class SomnusManager extends JavaPlugin {
 		InputStream defConfigStream = getResource("somnusPlayers.yml");
 		if (defConfigStream != null) {
 			@SuppressWarnings("deprecation")
-			YamlConfiguration defConfig = YamlConfiguration
-					.loadConfiguration(defConfigStream);
+			YamlConfiguration defConfig = YamlConfiguration.loadConfiguration(defConfigStream);
 			somnusPlayers.setDefaults(defConfig);
 		}
 	}
@@ -160,8 +162,7 @@ public class SomnusManager extends JavaPlugin {
 		try {
 			getSomnusPlayers().save(somnusPlayersFile);
 		} catch (IOException ex) {
-			getLogger().log(Level.SEVERE,
-					"Could not save config to " + somnusPlayersFile, ex);
+			getLogger().log(Level.SEVERE, "Could not save config to " + somnusPlayersFile, ex);
 		}
 	}
 
