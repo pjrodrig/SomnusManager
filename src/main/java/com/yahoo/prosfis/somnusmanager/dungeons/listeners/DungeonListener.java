@@ -2,11 +2,9 @@ package com.yahoo.prosfis.somnusmanager.dungeons.listeners;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -28,17 +26,20 @@ public class DungeonListener implements Listener {
 		}
 	}
 
-	@EventHandler(ignoreCancelled = true)
-	public void takeDamage(EntityDamageEvent event) {
-		Entity ent = event.getEntity();
-		if (ent instanceof Player
-				&& ent.getWorld().getName().equalsIgnoreCase("Dungeon")) {
-			Player player = (Player) ent;
-			double damage = event.getFinalDamage(), health = player.getHealth();
-			if (damage >= health)
-				damage = health;
-			player.setHealth(health - (damage - .5));
-			event.setDamage(.5);
-		}
-	}
+//	@EventHandler(ignoreCancelled = true, priority = EventPriorirty.High)
+//	public void takeDamage(EntityDamageEvent event) {
+//		Entity ent = event.getEntity();
+//		if (ent instanceof Player
+//				&& ent.getWorld().getName().equalsIgnoreCase("Dungeon")) {
+//			Player player = (Player) ent;
+//			double damage = event.getFinalDamage(), health = player.getHealth();
+//			ItemStack[] armor = player.getInventory().getArmorContents();
+//			if (damage > 2) {
+//				if (damage >= health)
+//					damage = health;
+//				event.setDamage(1);
+//				player.setHealth(health - (damage - 1));
+//			}
+//		}
+//	}
 }

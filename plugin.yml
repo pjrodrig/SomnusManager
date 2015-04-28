@@ -8,6 +8,11 @@ commands:
         usage: /<command> help
         permission: SomnusManager.arena
         permission-message: You do not have <permission>
+     qw:
+        description: All quick warp commands
+        usage: /<command> help
+        permission: SomnusManager.quickWarp
+        permission-message: You do not have <permission>
 permissions:
     SomnusManager.*:
         description: Gives access to all SomnusManager commands.
@@ -16,3 +21,6 @@ permissions:
     SomnusManager.arena:
         description: All arena commands
         default: true
+    SomnusManager.qw:
+        description: All quick warp commands
+        default: op
