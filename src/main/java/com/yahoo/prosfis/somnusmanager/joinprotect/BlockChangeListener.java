@@ -4,7 +4,9 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.Map;
+import java.util.Queue;
 import java.util.UUID;
 
 import org.bukkit.ChatColor;
@@ -32,11 +34,14 @@ public class BlockChangeListener implements Listener {
 	private final SomnusManager sm;
 	private final Map<UUID, Long> newPlayers;
 	private final BukkitScheduler scheduler;
+	private Queue<Runnable> queue;
+	private Thread thread;
 
 	public BlockChangeListener(SomnusManager sm) {
 		this.sm = sm;
 		this.scheduler = sm.getServer().getScheduler();
 		this.newPlayers = Maps.newHashMap();
+		queue = new LinkedList<Runnable>();
 		init();
 	}
 
@@ -96,18 +101,22 @@ public class BlockChangeListener implements Listener {
 		final World world = chunk.getWorld();
 		final String worldName = world.getName();
 		final int chunkX = chunk.getX(), chunkZ = chunk.getZ();
-		new Thread(new Runnable() {
+		addRunnable(new Runnable() {
 			public void run() {
 				try {
 					Connection connection = sm.getConnection();
 					if (connection != null) {
-						final ResultSet rs = connection.createStatement().executeQuery("SELECT * FROM sm_block_changes WHERE world ='" + worldName + "' AND chunk_x = " + chunkX + " AND chunk_z = " + chunkZ);
+						final ResultSet rs = connection.createStatement().executeQuery(
+								"SELECT * FROM sm_block_changes WHERE world ='" + worldName
+										+ "' AND chunk_x = " + chunkX + " AND chunk_z = " + chunkZ);
 						while (rs.next()) {
-							final int x = rs.getInt("block_x"), y = rs.getInt("block_y"), z = rs.getInt("block_z");
+							final int x = rs.getInt("block_x"), y = rs.getInt("block_y"), z = rs
+									.getInt("block_z");
 							final String id = rs.getString("uuid");
 							scheduler.scheduleSyncDelayedTask(sm, new Runnable() {
 								public void run() {
-									world.getBlockAt(x, y, z).setMetadata("SomnusPlayer", MetadataUtil.makeSimpleCallable(id, sm));
+									world.getBlockAt(x, y, z).setMetadata("SomnusPlayer",
+											MetadataUtil.makeSimpleCallable(id, sm));
 								}
 							});
 						}
@@ -116,7 +125,7 @@ public class BlockChangeListener implements Listener {
 					sm.getLogger().warning(e.getMessage());
 				}
 			}
-		}).start();
+		});
 	}
 
 	@EventHandler
@@ -125,23 +134,28 @@ public class BlockChangeListener implements Listener {
 		if (block.hasMetadata("SomnusPlayer")) {
 			Player player = event.getPlayer();
 			UUID id = player.getUniqueId();
-			if (!newPlayers.containsKey(id) || id.toString().equals(block.getMetadata("SomnusPlayer").get(0).asString())) {
+			if (!newPlayers.containsKey(id)
+					|| id.toString().equals(block.getMetadata("SomnusPlayer").get(0).asString())) {
 				block.removeMetadata("SomnusPlayer", sm);
-				new Thread(new Runnable() {
+				addRunnable(new Runnable() {
 					public void run() {
 						try {
 							sm.getConnection()
 									.createStatement()
 									.executeUpdate(
-											"DELETE FROM sm_block_changes WHERE world = '" + block.getWorld().getName() + "' AND block_x = " + block.getX() + " AND block_y = " + block.getY() + " AND block_z = "
-													+ block.getZ());
+											"DELETE FROM sm_block_changes WHERE world = '"
+													+ block.getWorld().getName()
+													+ "' AND block_x = " + block.getX()
+													+ " AND block_y = " + block.getY()
+													+ " AND block_z = " + block.getZ());
 						} catch (SQLException e) {
 							sm.getLogger().warning(e.getMessage());
 						}
 					}
-				}).start();
+				});
 			} else {
-				player.sendMessage(ChatColor.RED + "You cannot break blocks placed by other players yet.");
+				player.sendMessage(ChatColor.RED
+						+ "You cannot break blocks placed by other players yet.");
 			}
 		}
 	}
@@ -153,18 +167,34 @@ public class BlockChangeListener implements Listener {
 		final Location loc = block.getLocation();
 		final Chunk chunk = loc.getChunk();
 		block.setMetadata("SomnusPlayer", MetadataUtil.makeSimpleCallable(id.toString(), sm));
-		new Thread(new Runnable() {
+		addRunnable(new Runnable() {
 			public void run() {
 				try {
 					sm.getConnection()
 							.createStatement()
 							.execute(
-									"REPLACE INTO sm_block_changes(uuid, world, block_x, block_y, block_z, chunk_x, chunk_z) VALUES('" + id + "', '" + loc.getWorld().getName() + "', " + loc.getBlockX() + ", "
-											+ loc.getBlockY() + ", " + loc.getBlockZ() + ", " + chunk.getX() + ", " + chunk.getZ() + ")");
+									"REPLACE INTO sm_block_changes(uuid, world, block_x, block_y, block_z, chunk_x, chunk_z) VALUES('"
+											+ id + "', '" + loc.getWorld().getName() + "', "
+											+ loc.getBlockX() + ", " + loc.getBlockY() + ", "
+											+ loc.getBlockZ() + ", " + chunk.getX() + ", "
+											+ chunk.getZ() + ")");
 				} catch (SQLException e) {
 					sm.getLogger().warning(e.getMessage());
 				}
 			}
-		}).start();
+		});
+	}
+
+	private void addRunnable(Runnable runnable) {
+		queue.add(runnable);
+		if (thread == null || !thread.isAlive()) {
+			thread = new Thread(new Runnable() {
+				public void run() {
+					while (!queue.isEmpty()) {
+						queue.poll().run();
+					}
+				}
+			});
+		}
 	}
 }
