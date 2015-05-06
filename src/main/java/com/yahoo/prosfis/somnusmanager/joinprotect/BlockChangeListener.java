@@ -4,10 +4,10 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
 import java.util.UUID;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
@@ -41,7 +41,7 @@ public class BlockChangeListener implements Listener {
 		this.sm = sm;
 		this.scheduler = sm.getServer().getScheduler();
 		this.newPlayers = Maps.newHashMap();
-		queue = new LinkedList<Runnable>();
+		queue = new LinkedBlockingQueue<Runnable>();
 		init();
 	}
 
@@ -154,6 +154,7 @@ public class BlockChangeListener implements Listener {
 					}
 				});
 			} else {
+				event.setCancelled(true);
 				player.sendMessage(ChatColor.RED
 						+ "You cannot break blocks placed by other players yet.");
 			}
