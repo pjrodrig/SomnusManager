@@ -13,14 +13,24 @@ commands:
         usage: /<command> help
         permission: SomnusManager.quickWarp
         permission-message: You do not have <permission>
+     random:
+        description: All random commands
+        usage: /<command> help
+        permission: SomnusManager.random
+        permission-message: You do not have <permission>
 permissions:
     SomnusManager.*:
         description: Gives access to all SomnusManager commands.
         children:
             SomnusManager.arena: true
+            SomnusManager.qw: true
+            SomnusManager.random: true
     SomnusManager.arena:
         description: All arena commands
         default: true
     SomnusManager.qw:
         description: All quick warp commands
         default: op
+    SomnusManager.random:
+        description: All random commands
+        default: true

@@ -23,11 +23,14 @@ import com.yahoo.prosfis.somnusmanager.fireprotect.FireProtectListener;
 import com.yahoo.prosfis.somnusmanager.joinprotect.BlockChangeListener;
 import com.yahoo.prosfis.somnusmanager.quickwarp.QuickWarpCommandExecutor;
 import com.yahoo.prosfis.somnusmanager.quickwarp.QuickWarpManager;
+import com.yahoo.prosfis.somnusmanager.random.RandomCommandExecutor;
+import com.yahoo.prosfis.somnusmanager.random.RandomManager;
 
 public class SomnusManager extends JavaPlugin {
 
 	private ArenaManager am;
 	private QuickWarpManager qwm;
+	private RandomManager rm;
 	private Connection connection;
 	private String ip, port, dbName, username, password;
 	private FileConfiguration somnusPlayers = null;
@@ -45,6 +48,7 @@ public class SomnusManager extends JavaPlugin {
 	public void init() {
 		this.am = new ArenaManager(this);
 		this.qwm = new QuickWarpManager(this);
+		this.rm = new RandomManager(this);
 		assignCommands();
 		registerListeners();
 		openConnection();
@@ -56,6 +60,7 @@ public class SomnusManager extends JavaPlugin {
 		getCommand("arena").setExecutor(ace);
 		QuickWarpCommandExecutor qwce = new QuickWarpCommandExecutor(qwm);
 		getCommand("qw").setExecutor(qwce);
+		getCommand("random").setExecutor(new RandomCommandExecutor(rm, this));
 	}
 
 	public void registerListeners() {
