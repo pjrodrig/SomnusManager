@@ -25,12 +25,16 @@ import com.yahoo.prosfis.somnusmanager.quickwarp.QuickWarpCommandExecutor;
 import com.yahoo.prosfis.somnusmanager.quickwarp.QuickWarpManager;
 import com.yahoo.prosfis.somnusmanager.random.RandomCommandExecutor;
 import com.yahoo.prosfis.somnusmanager.random.RandomManager;
+import com.yahoo.prosfis.somnusmanager.warnings.WarningCommandExecutor;
+import com.yahoo.prosfis.somnusmanager.warnings.WarningListener;
+import com.yahoo.prosfis.somnusmanager.warnings.WarningManager;
 
 public class SomnusManager extends JavaPlugin {
 
 	private ArenaManager am;
 	private QuickWarpManager qwm;
 	private RandomManager rm;
+	private WarningManager wm;
 	private Connection connection;
 	private String ip, port, dbName, username, password;
 	private FileConfiguration somnusPlayers = null;
@@ -46,13 +50,14 @@ public class SomnusManager extends JavaPlugin {
 	}
 
 	public void init() {
+		openConnection();
+		checkTables();
 		this.am = new ArenaManager(this);
 		this.qwm = new QuickWarpManager(this);
 		this.rm = new RandomManager(this);
+		this.wm = new WarningManager(this);
 		assignCommands();
 		registerListeners();
-		openConnection();
-		checkTables();
 	}
 
 	public void assignCommands() {
@@ -61,6 +66,17 @@ public class SomnusManager extends JavaPlugin {
 		QuickWarpCommandExecutor qwce = new QuickWarpCommandExecutor(qwm);
 		getCommand("qw").setExecutor(qwce);
 		getCommand("random").setExecutor(new RandomCommandExecutor(rm, this));
+		WarningCommandExecutor wce = new WarningCommandExecutor(wm, this);
+		getCommand("warnings").setExecutor(wce);
+		getCommand("warn").setExecutor(wce);
+		getCommand("lwarn").setExecutor(wce);
+		getCommand("swarn").setExecutor(wce);
+		getCommand("slwarn").setExecutor(wce);
+		getCommand("lwarnas").setExecutor(wce);
+		getCommand("swarnas").setExecutor(wce);
+		getCommand("slwarnas").setExecutor(wce);
+		getCommand("cwarn").setExecutor(wce);
+		getCommand("warntp").setExecutor(wce);
 	}
 
 	public void registerListeners() {
@@ -69,6 +85,7 @@ public class SomnusManager extends JavaPlugin {
 		pm.registerEvents(new DungeonListener(), this);
 		pm.registerEvents(new FireProtectListener(this), this);
 		pm.registerEvents(new BlockChangeListener(this), this);
+		pm.registerEvents(new WarningListener(this), this);
 	}
 
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
@@ -106,6 +123,34 @@ public class SomnusManager extends JavaPlugin {
 										+ "VARCHAR(20), block_x INTEGER, block_y INTEGER, block_z "
 										+ "INTEGER, chunk_x INTEGER, chunk_z "
 										+ "INTEGER,  UNIQUE KEY unique_block (world, block_x, block_y, block_z))");
+			}
+		} catch (SQLException e) {
+			getLogger().warning(e.getMessage());
+		}
+		try {
+			ResultSet rs = connection.createStatement().executeQuery(
+					"SHOW TABLES LIKE 'sm_warnings'");
+			if (!rs.next()) {
+				getConnection()
+						.createStatement()
+						.execute(
+								"CREATE TABLE sm_warnings (uuid VARCHAR(40), id INTEGER NOT NULL AUTO_INCREMENT, warning TEXT, points INTEGER,"
+										+ "has_location BOOLEAN, world VARCHAR(40), x INTEGER, "
+										+ "y INTEGER, z INTEGER, date TIMESTAMP, viewed BOOLEAN, deleted BOOLEAN, PRIMARY KEY (uuid,id)) ENGINE=MyISAM");
+			}
+		} catch (SQLException e) {
+			getLogger().warning(e.getMessage());
+		}
+		try {
+			ResultSet rs = connection.createStatement().executeQuery(
+					"SHOW TABLES LIKE 'sm_warnings_history'");
+			if (!rs.next()) {
+				getConnection()
+						.createStatement()
+						.execute(
+								"CREATE TABLE sm_warnings_history (uuid VARCHAR(40), id INTEGER NOT NULL AUTO_INCREMENT, deleted_by VARCHAR(40), warning TEXT, points INTEGER,"
+										+ "has_location BOOLEAN, world VARCHAR(40), x INTEGER, "
+										+ "y INTEGER, z INTEGER, date TIMESTAMP, PRIMARY KEY (uuid,id)) ENGINE=MyISAM");
 			}
 		} catch (SQLException e) {
 			getLogger().warning(e.getMessage());

@@ -18,6 +18,39 @@ commands:
         usage: /<command> help
         permission: SomnusManager.random
         permission-message: You do not have <permission>
+     warnings:
+        permission: SomnusManager.warnings
+        permission-message: You do not have <permission>
+     warn:
+        permission: SomnusManager.Staff
+        permission-message: You do not have <permission>
+     lwarn:
+        permission: SomnusManager.Staff
+        permission-message: You do not have <permission>
+     swarn:
+        permission: SomnusManager.Staff
+        permission-message: You do not have <permission>
+     slwarn:
+        permission: SomnusManager.Staff
+        permission-message: You do not have <permission>
+     warnas:
+        permission: SomnusManager.Admin
+        permission-message: You do not have <permission>
+     lwarnas:
+        permission: SomnusManager.Admin
+        permission-message: You do not have <permission>
+     swarnas:
+        permission: SomnusManager.Admin
+        permission-message: You do not have <permission>
+     slwarnas:
+        permission: SomnusManager.Admin
+        permission-message: You do not have <permission>
+     cwarn:
+        permission: SomnusManager.Staff
+        permission-message: You do not have <permission>
+     warntp:
+        permission: SomnusManager.Staff
+        permission-message: You do not have <permission>
 permissions:
     SomnusManager.*:
         description: Gives access to all SomnusManager commands.
@@ -25,6 +58,12 @@ permissions:
             SomnusManager.arena: true
             SomnusManager.qw: true
             SomnusManager.random: true
+    SomnusManager.staff:
+        description: Staff commands
+        default: op
+    SomnusManager.admin:
+        description: Admin commands
+        default: op
     SomnusManager.arena:
         description: All arena commands
         default: true
