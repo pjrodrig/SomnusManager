@@ -8,6 +8,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.logging.Level;
 
+import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -50,6 +51,9 @@ public class SomnusManager extends JavaPlugin {
 	}
 
 	public void onDisable() {
+		for(World world : getServer().getWorlds()){
+			world.setGameRuleValue("doFireTick", "false");
+		}
 		getLogger().info("SomnusManager is disabled.");
 	}
 
@@ -63,6 +67,9 @@ public class SomnusManager extends JavaPlugin {
 		this.shm = new StaffHelpManager(this);
 		assignCommands();
 		registerListeners();
+		for(World world : getServer().getWorlds()){
+			world.setGameRuleValue("doFireTick", "true");
+		}
 	}
 
 	public void assignCommands() {
