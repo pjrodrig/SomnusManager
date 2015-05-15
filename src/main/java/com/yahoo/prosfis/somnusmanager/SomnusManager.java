@@ -21,6 +21,7 @@ import com.yahoo.prosfis.somnusmanager.arena.listeners.ArenaListener;
 import com.yahoo.prosfis.somnusmanager.dungeons.listeners.DungeonListener;
 import com.yahoo.prosfis.somnusmanager.fireprotect.FireProtectListener;
 import com.yahoo.prosfis.somnusmanager.joinprotect.BlockChangeListener;
+import com.yahoo.prosfis.somnusmanager.pigmanfix.PigmanListener;
 import com.yahoo.prosfis.somnusmanager.quickwarp.QuickWarpCommandExecutor;
 import com.yahoo.prosfis.somnusmanager.quickwarp.QuickWarpManager;
 import com.yahoo.prosfis.somnusmanager.random.RandomCommandExecutor;
@@ -92,6 +93,7 @@ public class SomnusManager extends JavaPlugin {
 		pm.registerEvents(new FireProtectListener(this), this);
 		pm.registerEvents(new BlockChangeListener(this), this);
 		pm.registerEvents(new WarningListener(this), this);
+		pm.registerEvents(new PigmanListener(), this);
 	}
 
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
