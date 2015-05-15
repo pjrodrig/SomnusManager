@@ -51,6 +51,9 @@ commands:
      warntp:
         permission: SomnusManager.Staff
         permission-message: You do not have <permission>
+     staff:
+        permission: SomnusManager.staffHelp
+        permission-message: You do not have <permission>
 permissions:
     SomnusManager.*:
         description: Gives access to all SomnusManager commands.
@@ -72,4 +75,7 @@ permissions:
         default: op
     SomnusManager.random:
         description: All random commands
+        default: true
+    SomnusManager.staffHelp:
+        description: Request staff help
         default: true
