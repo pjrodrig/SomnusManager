@@ -54,6 +54,7 @@ public class StaffHelpCommandExecutor implements CommandExecutor {
 			while (i < args.length) {
 				sb.append(" ");
 				sb.append(args[i]);
+				i++;
 			}
 		}
 		return sb.toString();
