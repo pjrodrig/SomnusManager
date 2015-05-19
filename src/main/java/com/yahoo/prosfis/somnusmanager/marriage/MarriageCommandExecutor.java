@@ -145,7 +145,7 @@ public class MarriageCommandExecutor implements CommandExecutor {
 
 	private void help(CommandSender sender) {
 		sender.sendMessage(new String[] { ChatColor.GOLD + "Marriage help menu:",
-				ChatColor.AQUA + "/church" + ChatColor.GRAY + "warp to church",
+				ChatColor.AQUA + "/church: " + ChatColor.GRAY + "warp to church",
 				ChatColor.AQUA + "/propose <player>: " + ChatColor.GRAY + "propose to player",
 				ChatColor.AQUA + "/marry accept: " + ChatColor.GRAY + "accept proposal",
 				ChatColor.AQUA + "/marry sethome: " + ChatColor.GRAY + "set shared marriage home",
