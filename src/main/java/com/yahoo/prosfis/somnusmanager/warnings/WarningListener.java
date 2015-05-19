@@ -53,7 +53,7 @@ public class WarningListener implements Listener {
 									}
 								}, 20);
 					}
-					if (total > 0) {
+					if (total > 0 && !player.hasPermission("SomnusManager.staff")) {
 						for (Player p : sm.getServer().getOnlinePlayers()) {
 							if (p.hasPermission("SomnusManager.staff")) {
 								p.sendMessage(ChatColor.GRAY + player.getName() + " has "
