@@ -52,8 +52,7 @@ public class MarriageManager {
 	public void init() {
 		FileConfiguration config = getMarriageConfig();
 		warp = ConfigUtil.loadLocation(sm.getServer(), config, "Church.Warp.");
-		priestLoc = ConfigUtil.loadLocation(sm.getServer(), config,
-				"Church.Priest.");
+		priestLoc = ConfigUtil.loadLocation(sm.getServer(), config, "Church.Priest.");
 		p1Loc = ConfigUtil.loadLocation(sm.getServer(), config, "Church.P1.");
 		p2Loc = ConfigUtil.loadLocation(sm.getServer(), config, "Church.P2.");
 		ConfigurationSection section = config.createSection("Marriages");
@@ -66,8 +65,7 @@ public class MarriageManager {
 			path = "Marriages." + iter.next() + ".";
 			p1 = UUID.fromString(config.getString(path + "P1"));
 			p2 = UUID.fromString(config.getString(path + "P2"));
-			loc = ConfigUtil.loadLocation(sm.getServer(), config, path
-					+ "Home.");
+			loc = ConfigUtil.loadLocation(sm.getServer(), config, path + "Home.");
 			couple = new Couple(p1, p2);
 			if (loc != null)
 				couple.setHome(loc);
@@ -98,8 +96,7 @@ public class MarriageManager {
 
 	public void setPriest(Player player) {
 		priestLoc = player.getLocation();
-		ConfigUtil.saveLocation(getMarriageConfig(), "Church.Priest.",
-				priestLoc);
+		ConfigUtil.saveLocation(getMarriageConfig(), "Church.Priest.", priestLoc);
 		saveMarriageConfig();
 		player.sendMessage(ChatColor.GREEN + "Location set");
 	}
@@ -108,12 +105,14 @@ public class MarriageManager {
 		p1Loc = player.getLocation();
 		ConfigUtil.saveLocation(getMarriageConfig(), "Church.P1.", p1Loc);
 		saveMarriageConfig();
+		player.sendMessage(ChatColor.GREEN + "Location set");
 	}
 
 	public void setPlayer2(Player player) {
-		p1Loc = player.getLocation();
+		p2Loc = player.getLocation();
 		ConfigUtil.saveLocation(getMarriageConfig(), "Church.P2.", p2Loc);
 		saveMarriageConfig();
+		player.sendMessage(ChatColor.GREEN + "Location set");
 	}
 
 	public void warp(Player player) {
@@ -121,21 +120,18 @@ public class MarriageManager {
 	}
 
 	public void propose(Player proposer, Player proposee) {
-		UUID proposerId = proposer.getUniqueId(), proposeeId = proposee
-				.getUniqueId();
+		UUID proposerId = proposer.getUniqueId(), proposeeId = proposee.getUniqueId();
 		if (marriages.containsKey(proposerId)) {
 			proposer.sendMessage(ChatColor.RED
 					+ "You are already married. Use '/divorce' to divorce.");
 		} else if (marriages.containsKey(proposeeId)) {
-			proposer.sendMessage(ChatColor.RED
-					+ "That player is already married.");
+			proposer.sendMessage(ChatColor.RED + "That player is already married.");
 		} else {
 			if (proposals.containsKey(proposeeId)) {
 				if (proposals.get(proposeeId).equals(proposerId)) {
 					proposer.sendMessage(ChatColor.RED
 							+ "You have already proposed to this player.");
-					proposer.sendMessage(ChatColor.RED
-							+ "You must wait to propose again.");
+					proposer.sendMessage(ChatColor.RED + "You must wait to propose again.");
 				}
 			} else {
 				addProposal(proposer, proposerId, proposee, proposeeId);
@@ -143,13 +139,13 @@ public class MarriageManager {
 		}
 	}
 
-	private void addProposal(Player proposer, final UUID proposerId,
-			Player proposee, final UUID proposeeId) {
-		proposer.sendMessage(ChatColor.GRAY + "You have proposed to "
-				+ ChatColor.LIGHT_PURPLE + proposee.getName() + ChatColor.GRAY
-				+ ".");
-		proposee.sendMessage(ChatColor.LIGHT_PURPLE + proposer.getName()
-				+ ChatColor.GRAY + " has proposed to you.");
+	private void addProposal(Player proposer, final UUID proposerId, Player proposee,
+			final UUID proposeeId) {
+		proposer.sendMessage(ChatColor.GRAY + "You have proposed to " + ChatColor.LIGHT_PURPLE
+				+ proposee.getName() + ChatColor.GRAY + ".");
+		proposee.sendMessage(ChatColor.LIGHT_PURPLE + proposer.getName() + ChatColor.GRAY
+				+ " has proposed to you. Type " + ChatColor.LIGHT_PURPLE + "/marry accept"
+				+ ChatColor.GRAY + " to accept.");
 		proposals.put(proposeeId, proposerId);
 		sm.getServer().getScheduler().runTaskLater(sm, new Runnable() {
 			public void run() {
@@ -165,8 +161,7 @@ public class MarriageManager {
 		if (proposals.containsKey(id)) {
 			Player spouse = sm.getServer().getPlayer(proposals.get(id));
 			if (spouse == null) {
-				player.sendMessage(ChatColor.RED
-						+ "That player is no longer online.");
+				player.sendMessage(ChatColor.RED + "That player is no longer online.");
 				proposals.remove(id);
 			} else {
 				switch (status) {
@@ -174,8 +169,8 @@ public class MarriageManager {
 					p1 = spouse;
 					p2 = player;
 					logoutListener = new LogoutListener(p1, p2, this);
-					sm.getServer().getPluginManager()
-							.registerEvents(logoutListener, sm);
+					sm.getServer().getPluginManager().registerEvents(logoutListener, sm);
+					status = Status.PLANNING;
 					getPriest();
 					break;
 				case PLANNING:
@@ -183,8 +178,7 @@ public class MarriageManager {
 							+ "Another wedding is currently being planned.");
 					break;
 				case ACTIVE:
-					player.sendMessage(ChatColor.RED
-							+ "Another wedding is taking place.");
+					player.sendMessage(ChatColor.RED + "Another wedding is taking place.");
 					break;
 				case COOLDOWN:
 					player.sendMessage(ChatColor.RED
@@ -193,19 +187,16 @@ public class MarriageManager {
 				}
 			}
 		} else {
-			player.sendMessage(ChatColor.RED
-					+ "You have no active proposals at this time.");
+			player.sendMessage(ChatColor.RED + "You have no active proposals at this time.");
 		}
 	}
 
 	private void getPriest() {
 		final Server server = sm.getServer();
-		server.broadcastMessage(ChatColor.LIGHT_PURPLE + p1.getName()
-				+ ChatColor.GRAY + " and " + ChatColor.LIGHT_PURPLE
-				+ p2.getName() + ChatColor.GRAY
+		server.broadcastMessage(ChatColor.LIGHT_PURPLE + p1.getName() + ChatColor.GRAY + " and "
+				+ ChatColor.LIGHT_PURPLE + p2.getName() + ChatColor.GRAY
 				+ " have agreed to get married.");
-		server.broadcastMessage(ChatColor.GRAY
-				+ "Is there a priest who will marry them? Use "
+		server.broadcastMessage(ChatColor.GRAY + "Is there a priest or an acolyte who will marry them? Use "
 				+ ChatColor.LIGHT_PURPLE + "/marry priest ");
 		timer = server.getScheduler().runTaskLater(sm, new Runnable() {
 			public void run() {
@@ -216,20 +207,20 @@ public class MarriageManager {
 			}
 		}, 20 * 30);
 	}
-	
-	public void cancelWedding(){
+
+	public void cancelWedding() {
 		p1 = null;
 		p2 = null;
 		priest = null;
-		if(logoutListener != null){
+		if (logoutListener != null) {
 			logoutListener.unregister();
 			logoutListener = null;
 		}
-		if(iDoListener != null){
+		if (iDoListener != null) {
 			iDoListener.unregister();
 			iDoListener = null;
 		}
-		if(timer != null){
+		if (timer != null) {
 			timer.cancel();
 			timer = null;
 		}
@@ -239,27 +230,25 @@ public class MarriageManager {
 	public void addPriest(Player player) {
 		if (status == Status.PLANNING) {
 			if (p1.equals(player) || p2.equals(player)) {
-				player.sendMessage(ChatColor.RED
-						+ "You cannot host your own wedding.");
+				player.sendMessage(ChatColor.RED + "You cannot host your own wedding.");
 			} else {
 				logoutListener.unregister();
 				priest = player;
+				timer.cancel();
 				startWedding();
 			}
 		} else {
-			player.sendMessage(ChatColor.RED
-					+ "There are no pending marriages at this time.");
+			player.sendMessage(ChatColor.RED + "There are no pending marriages at this time.");
 		}
 	}
 
 	private void startWedding() {
 		status = Status.ACTIVE;
 		Server server = sm.getServer();
-		server.broadcastMessage(ChatColor.LIGHT_PURPLE + p1.getName()
-				+ ChatColor.GRAY + " and " + ChatColor.LIGHT_PURPLE
-				+ p2.getName() + ChatColor.GRAY + " are getting married. Use "
-				+ ChatColor.LIGHT_PURPLE + "/church" + ChatColor.GRAY
-				+ " to watch.");
+		server.broadcastMessage(ChatColor.LIGHT_PURPLE + p1.getName() + ChatColor.GRAY + " and "
+				+ ChatColor.LIGHT_PURPLE + p2.getName() + ChatColor.GRAY
+				+ " are getting married. Use " + ChatColor.LIGHT_PURPLE + "/church"
+				+ ChatColor.GRAY + " to watch.");
 		priest.teleport(priestLoc);
 		p1.teleport(p1Loc);
 		p2.teleport(p2Loc);
@@ -269,9 +258,8 @@ public class MarriageManager {
 
 	public void cancelWedding(Player player) {
 		sm.getServer().broadcastMessage(
-				ChatColor.GRAY + "The wedding has been canceled because "
-						+ ChatColor.LIGHT_PURPLE + player.getName()
-						+ " has left the game.");
+				ChatColor.GRAY + "The wedding has been canceled because " + ChatColor.LIGHT_PURPLE
+						+ player.getName() + " has left the game.");
 		p1 = null;
 		p2 = null;
 		status = Status.OPEN;
@@ -283,9 +271,9 @@ public class MarriageManager {
 		marriages.put(p1Id, couple);
 		marriages.put(p2Id, couple);
 		sm.getServer().broadcastMessage(
-				ChatColor.LIGHT_PURPLE + p1.getName() + ChatColor.GRAY
-						+ " and " + ChatColor.LIGHT_PURPLE + p2.getName()
-						+ ChatColor.GRAY + " are now married!");
+				ChatColor.LIGHT_PURPLE + p1.getName() + ChatColor.GRAY + " and "
+						+ ChatColor.LIGHT_PURPLE + p2.getName() + ChatColor.GRAY
+						+ " are now married!");
 		saveCouple(couple);
 	}
 
@@ -321,12 +309,10 @@ public class MarriageManager {
 			if (home != null) {
 				player.teleport(home);
 			} else {
-				player.sendMessage(ChatColor.RED
-						+ "That player has not set a marry home yet.");
+				player.sendMessage(ChatColor.RED + "That player has not set a marry home yet.");
 			}
 		} else {
-			player.sendMessage(ChatColor.RED
-					+ "That player is not married to anyone.");
+			player.sendMessage(ChatColor.RED + "That player is not married to anyone.");
 		}
 	}
 
@@ -360,18 +346,14 @@ public class MarriageManager {
 			if (chats.containsKey(id)) {
 				chats.get(id).unregister();
 				chats.remove(id);
-				player.sendMessage(ChatColor.DARK_GREEN
-						+ "You left Marriage Chat.");
+				player.sendMessage(ChatColor.DARK_GREEN + "You left Marriage Chat.");
 			} else {
-				Player spouse = sm.getServer().getPlayer(
-						marriages.get(id).getPartner(id));
+				Player spouse = sm.getServer().getPlayer(marriages.get(id).getPartner(id));
 				if (spouse == null) {
-					player.sendMessage(ChatColor.RED
-							+ "Your partner is not online.");
+					player.sendMessage(ChatColor.RED + "Your partner is not online.");
 				}
 				chats.put(id, new MarriageChatListener(player, spouse));
-				player.sendMessage(ChatColor.DARK_GREEN
-						+ "You are now in Marriage Chat.");
+				player.sendMessage(ChatColor.DARK_GREEN + "You are now in Marriage Chat.");
 			}
 		} else {
 			player.sendMessage(ChatColor.RED + "You are not married to anyone.");
@@ -385,18 +367,15 @@ public class MarriageManager {
 	 */
 	public void reloadMarriageConfig() {
 		if (marriageConfigFile == null) {
-			marriageConfigFile = new File(sm.getDataFolder(),
-					"marriageConfig.yml");
+			marriageConfigFile = new File(sm.getDataFolder(), "marriageConfig.yml");
 		}
-		marriageConfig = YamlConfiguration
-				.loadConfiguration(marriageConfigFile);
+		marriageConfig = YamlConfiguration.loadConfiguration(marriageConfigFile);
 
 		// Look for defaults in the jar
 		InputStream defConfigStream = sm.getResource("marriageConfig.yml");
 		if (defConfigStream != null) {
 			@SuppressWarnings("deprecation")
-			YamlConfiguration defConfig = YamlConfiguration
-					.loadConfiguration(defConfigStream);
+			YamlConfiguration defConfig = YamlConfiguration.loadConfiguration(defConfigStream);
 			marriageConfig.setDefaults(defConfig);
 		}
 	}
@@ -423,8 +402,7 @@ public class MarriageManager {
 		try {
 			getMarriageConfig().save(marriageConfigFile);
 		} catch (IOException ex) {
-			sm.getLogger().log(Level.SEVERE,
-					"Could not save config to " + marriageConfigFile, ex);
+			sm.getLogger().log(Level.SEVERE, "Could not save config to " + marriageConfigFile, ex);
 		}
 	}
 

@@ -3,7 +3,7 @@ main: com.yahoo.prosfis.somnusmanager.SomnusManager
 version: 1.0.0
 
 commands:
-    arena:
+     arena:
         description: All arena commands
         usage: /arena help
         permission: SomnusManager.default
@@ -70,10 +70,6 @@ commands:
         description: Divorce your spouse
         usage: /marry help
         permission: SomnusManager.default
-     addpriest:
-        description: All marriage commands
-        usage: /<command> player
-        permission: SomnusManager.consoleOnly
 permissions:
     SomnusManager.*:
         description: Gives access to all SomnusManager commands.
@@ -86,10 +82,10 @@ permissions:
             SomnusManager.arena: true
             SomnusManager.qw: true
             SomnusManager.random: true
+            SomnusManager.marriage: true
     SomnusManager.staff:
         description: Staff commands
         default: op
-            SomnusManager.marriage: true
     SomnusManager.default:
         description: All default commands for SomnusManager
     SomnusManager.admin:

@@ -1,11 +1,13 @@
 package com.yahoo.prosfis.somnusmanager.marriage;
 
+import java.util.List;
+
 import org.bukkit.ChatColor;
-import org.bukkit.Server;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.metadata.MetadataValue;
 
 import com.yahoo.prosfis.somnusmanager.SomnusManager;
 
@@ -19,8 +21,7 @@ public class MarriageCommandExecutor implements CommandExecutor {
 		this.sm = sm;
 	}
 
-	public boolean onCommand(CommandSender sender, Command cmd, String label,
-			String[] args) {
+	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		if (cmd.getName().equalsIgnoreCase("church")) {
 			if (args.length == 0) {
 				if (sender instanceof Player) {
@@ -42,6 +43,7 @@ public class MarriageCommandExecutor implements CommandExecutor {
 							} else if (args[1].equalsIgnoreCase("priest")) {
 								mm.setPriest(player);
 							}
+							return true;
 						} else
 							player.sendMessage(ChatColor.RED
 									+ "You do not have permission to use this command.");
@@ -55,8 +57,7 @@ public class MarriageCommandExecutor implements CommandExecutor {
 				if (args.length == 1) {
 					Player player = sm.getServer().getPlayer(args[0]);
 					if (player == null) {
-						sender.sendMessage(ChatColor.RED
-								+ "That player is not online.");
+						sender.sendMessage(ChatColor.RED + "That player is not online.");
 					} else {
 						mm.propose((Player) sender, player);
 					}
@@ -71,6 +72,16 @@ public class MarriageCommandExecutor implements CommandExecutor {
 				if (args[0].equalsIgnoreCase("help")) {
 					if (args.length == 1) {
 						help(sender);
+						return true;
+					}
+				} else if (args[0].equalsIgnoreCase("accept")) {
+					if (sender instanceof Player) {
+						if (args.length == 1) {
+							mm.acceptProposal((Player) sender);
+							return true;
+						}
+					} else {
+						sender.sendMessage("Only a player may issue this command.");
 						return true;
 					}
 				} else if (args[0].equalsIgnoreCase("sethome")) {
@@ -102,13 +113,17 @@ public class MarriageCommandExecutor implements CommandExecutor {
 				} else if (args[0].equalsIgnoreCase("priest")) {
 					if (args.length == 1) {
 						if (sender instanceof Player) {
-							Server server = sm.getServer();
 							Player player = (Player) sender;
-							server.dispatchCommand(
-									server.getConsoleSender(),
-									"ifclass " + player.getName()
-											+ " priest addpriest "
-											+ player.getName());
+							List<MetadataValue> list = player.getMetadata("RPGClass");
+							if (list != null && list.size() > 0) {
+								int pclass = list.get(0).asInt();
+								if (pclass == 1 || pclass == 101) {
+									mm.addPriest(player);
+								} else {
+									sender.sendMessage(ChatColor.RED
+											+ "You are not a priest or an acolyte.");
+								}
+							}
 						} else
 							sender.sendMessage("Only players may issue this command.");
 						return true;
@@ -123,39 +138,30 @@ public class MarriageCommandExecutor implements CommandExecutor {
 					sender.sendMessage("Only players may issue this command.");
 				return true;
 			}
-		} else if (cmd.getName().equalsIgnoreCase("addpriest")) {
-			if (!(sender instanceof Player)) {
-				mm.addPriest((Player) sender);
-				return true;
-			}
 		}
 		sender.sendMessage(ChatColor.RED + "/marry help");
 		return true;
 	}
 
 	private void help(CommandSender sender) {
-		sender.sendMessage(new String[] {
-				ChatColor.GOLD + "Marriage help menu:",
+		sender.sendMessage(new String[] { ChatColor.GOLD + "Marriage help menu:",
 				ChatColor.AQUA + "/church" + ChatColor.GRAY + "warp to church",
-				ChatColor.AQUA + "/propose <player>: " + ChatColor.GRAY
-						+ "propose to player",
-				ChatColor.AQUA + "/marry sethome: " + ChatColor.GRAY
-						+ "set shared marriage home",
-				ChatColor.AQUA + "/marry home: " + ChatColor.GRAY
-						+ "warp to your mariage home",
-				ChatColor.AQUA + "/marry chat" + ChatColor.GRAY
-						+ "chat with your spouse",
-				ChatColor.AQUA + "/divorce: " + ChatColor.GRAY
-						+ "divorce your partner" });
-		if (!(sender instanceof Player)
-				|| ((Player) sender).hasPermission("SomnusManager.admin")) {
+				ChatColor.AQUA + "/propose <player>: " + ChatColor.GRAY + "propose to player",
+				ChatColor.AQUA + "/marry accept: " + ChatColor.GRAY + "accept proposal",
+				ChatColor.AQUA + "/marry sethome: " + ChatColor.GRAY + "set shared marriage home",
+				ChatColor.AQUA + "/marry home: " + ChatColor.GRAY + "warp to your mariage home",
+				ChatColor.AQUA + "/marry chat: " + ChatColor.GRAY + "chat with your spouse",
+				ChatColor.AQUA + "/divorce: " + ChatColor.GRAY + "divorce your partner" });
+		if (!(sender instanceof Player) || ((Player) sender).hasPermission("SomnusManager.admin")) {
 			sender.sendMessage(new String[] {
-					ChatColor.GOLD + "Arena admin commands:",
-					ChatColor.AQUA + "COMING SOON",
-					ChatColor.AQUA
-							+ "You may use '/pluman unload SomnusManager' then '/plugman load SomnusManager' if needed",
-					ChatColor.RED
-							+ "DO NOT USE '/plugman reload SomnusManager'" });
+					ChatColor.GOLD + "Arena marriage commands:",
+					ChatColor.AQUA + "/church set warp: " + ChatColor.GRAY + "set church warp",
+					ChatColor.AQUA + "/church set p1: " + ChatColor.GRAY
+							+ "set first player's position",
+					ChatColor.AQUA + "/church set p2: " + ChatColor.GRAY
+							+ "set second player's position",
+					ChatColor.AQUA + "/church set priest: " + ChatColor.GRAY
+							+ "set priest's position" });
 		}
 	}
 }

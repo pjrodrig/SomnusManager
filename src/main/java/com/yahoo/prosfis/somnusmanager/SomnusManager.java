@@ -100,7 +100,6 @@ public class SomnusManager extends JavaPlugin {
 		getCommand("church").setExecutor(mce);
 		getCommand("propose").setExecutor(mce);
 		getCommand("divorce").setExecutor(mce);
-		getCommand("addpriest").setExecutor(mce);
 	}
 
 	public void registerListeners() {
