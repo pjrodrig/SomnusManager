@@ -5,8 +5,8 @@ version: 1.0.0
 commands:
      arena:
         description: All arena commands
-        usage: /<command> help
-        permission: SomnusManager.arena
+        usage: /arena help
+        permission: SomnusManager.default
         permission-message: You do not have <permission>
      qw:
         description: All quick warp commands
@@ -54,22 +54,55 @@ commands:
      staff:
         permission: SomnusManager.staffHelp
         permission-message: You do not have <permission>
+     marry:
+        description: All marriage commands
+        usage: /marry help
+        permission: SomnusManager.default
+     church:
+        description: Teleport to church
+        usage: /marry help
+        permission: SomnusManager.default
+     propose:
+        description: Propose to a player
+        usage: /marry help
+        permission: SomnusManager.default
+     divorce:
+        description: Divorce your spouse
+        usage: /marry help
+        permission: SomnusManager.default
+     event:
+        description: All event commands
+        usage: /event help
+        permission: SomnusManager.Admin
+     love:
+        description: command for love letters event
+        usage: /love <player> <message>
+        permission: SomnusManager.default
+     bid:
+        description: bid for lottery
+        usage: /bid
+        permission: SomnusManager.default
 permissions:
     SomnusManager.*:
         description: Gives access to all SomnusManager commands.
         children:
+            SomnusManager.admin: true
+            SomnusManager.default: true
+    SomnusManager.default:
+        description: The default permission for SomnusManager.
+        children:
             SomnusManager.arena: true
             SomnusManager.qw: true
             SomnusManager.random: true
+            SomnusManager.marriage: true
     SomnusManager.staff:
         description: Staff commands
         default: op
+    SomnusManager.default:
+        description: All default commands for SomnusManager
     SomnusManager.admin:
         description: Admin commands
         default: op
-    SomnusManager.arena:
-        description: All arena commands
-        default: true
     SomnusManager.qw:
         description: All quick warp commands
         default: op
@@ -79,3 +112,6 @@ permissions:
     SomnusManager.staffHelp:
         description: Request staff help
         default: true
+    SomnusManager.admin:
+        description: Admin permission for SomnusManager
+        default: op

@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
@@ -79,9 +80,11 @@ public class RandomManager {
 		BlockIterator iter = new BlockIterator(loc, 256);
 		Block current;
 		Location landing = null;
+		Material type;
 		while (landing == null && iter.hasNext()) {
 			current = iter.next();
-			if (current.getType().isSolid()) {
+			type = current.getType();
+			if (!(type == Material.LEAVES || type == Material.LEAVES_2) && type.isSolid() && !type.isTransparent() && type.isOccluding()) {
 				landing = current.getLocation().add(.5, 1, .5);
 			} else if (current.isLiquid()) {
 				break;

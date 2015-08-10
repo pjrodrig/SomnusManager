@@ -8,6 +8,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.logging.Level;
 
+import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -19,8 +20,11 @@ import com.yahoo.prosfis.somnusmanager.arena.ArenaCommandExecutor;
 import com.yahoo.prosfis.somnusmanager.arena.ArenaManager;
 import com.yahoo.prosfis.somnusmanager.arena.listeners.ArenaListener;
 import com.yahoo.prosfis.somnusmanager.dungeons.listeners.DungeonListener;
+import com.yahoo.prosfis.somnusmanager.events.EventManager;
 import com.yahoo.prosfis.somnusmanager.fireprotect.FireProtectListener;
 import com.yahoo.prosfis.somnusmanager.joinprotect.BlockChangeListener;
+import com.yahoo.prosfis.somnusmanager.marriage.MarriageCommandExecutor;
+import com.yahoo.prosfis.somnusmanager.marriage.MarriageManager;
 import com.yahoo.prosfis.somnusmanager.pigmanfix.PigmanListener;
 import com.yahoo.prosfis.somnusmanager.quickwarp.QuickWarpCommandExecutor;
 import com.yahoo.prosfis.somnusmanager.quickwarp.QuickWarpManager;
@@ -43,6 +47,7 @@ public class SomnusManager extends JavaPlugin {
 	private String ip, port, dbName, username, password;
 	private FileConfiguration somnusPlayers = null;
 	private File somnusPlayersFile = null;
+	private MarriageManager mm;
 
 	public void onEnable() {
 		getLogger().info("SomnusManager is enabled.");
@@ -50,19 +55,27 @@ public class SomnusManager extends JavaPlugin {
 	}
 
 	public void onDisable() {
+		for(World world : getServer().getWorlds()){
+			world.setGameRuleValue("doFireTick", "false");
+		}
 		getLogger().info("SomnusManager is disabled.");
 	}
 
 	public void init() {
 		openConnection();
 		checkTables();
+		new EventManager(this);
 		this.am = new ArenaManager(this);
 		this.qwm = new QuickWarpManager(this);
 		this.rm = new RandomManager(this);
 		this.wm = new WarningManager(this);
 		this.shm = new StaffHelpManager(this);
+		this.mm = new MarriageManager(this);
 		assignCommands();
 		registerListeners();
+		for(World world : getServer().getWorlds()){
+			world.setGameRuleValue("doFireTick", "true");
+		}
 	}
 
 	public void assignCommands() {
@@ -84,6 +97,11 @@ public class SomnusManager extends JavaPlugin {
 		getCommand("warntp").setExecutor(wce);
 		StaffHelpCommandExecutor shce = new StaffHelpCommandExecutor(shm);
 		getCommand("staff").setExecutor(shce);
+		MarriageCommandExecutor mce = new MarriageCommandExecutor(mm, this);
+		getCommand("marry").setExecutor(mce);
+		getCommand("church").setExecutor(mce);
+		getCommand("propose").setExecutor(mce);
+		getCommand("divorce").setExecutor(mce);
 	}
 
 	public void registerListeners() {
