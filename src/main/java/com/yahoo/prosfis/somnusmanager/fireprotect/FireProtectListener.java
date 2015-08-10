@@ -5,6 +5,7 @@ import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBurnEvent;
+import org.bukkit.event.block.BlockSpreadEvent;
 
 import com.yahoo.prosfis.somnusmanager.SomnusManager;
 
@@ -14,6 +15,13 @@ public class FireProtectListener implements Listener{
 	
 	public FireProtectListener(SomnusManager sm){
 		this.sm = sm;
+	}
+	
+	@EventHandler
+	public void spread(BlockSpreadEvent event){
+		if(event.getNewState().getType() == Material.FIRE){
+			event.setCancelled(true);
+		}
 	}
 	
 	@EventHandler

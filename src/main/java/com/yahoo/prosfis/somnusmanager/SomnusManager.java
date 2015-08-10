@@ -20,8 +20,11 @@ import com.yahoo.prosfis.somnusmanager.arena.ArenaCommandExecutor;
 import com.yahoo.prosfis.somnusmanager.arena.ArenaManager;
 import com.yahoo.prosfis.somnusmanager.arena.listeners.ArenaListener;
 import com.yahoo.prosfis.somnusmanager.dungeons.listeners.DungeonListener;
+import com.yahoo.prosfis.somnusmanager.events.EventManager;
 import com.yahoo.prosfis.somnusmanager.fireprotect.FireProtectListener;
 import com.yahoo.prosfis.somnusmanager.joinprotect.BlockChangeListener;
+import com.yahoo.prosfis.somnusmanager.marriage.MarriageCommandExecutor;
+import com.yahoo.prosfis.somnusmanager.marriage.MarriageManager;
 import com.yahoo.prosfis.somnusmanager.pigmanfix.PigmanListener;
 import com.yahoo.prosfis.somnusmanager.quickwarp.QuickWarpCommandExecutor;
 import com.yahoo.prosfis.somnusmanager.quickwarp.QuickWarpManager;
@@ -32,8 +35,6 @@ import com.yahoo.prosfis.somnusmanager.staffhelp.StaffHelpManager;
 import com.yahoo.prosfis.somnusmanager.warnings.WarningCommandExecutor;
 import com.yahoo.prosfis.somnusmanager.warnings.WarningListener;
 import com.yahoo.prosfis.somnusmanager.warnings.WarningManager;
-import com.yahoo.prosfis.somnusmanager.marriage.MarriageCommandExecutor;
-import com.yahoo.prosfis.somnusmanager.marriage.MarriageManager;
 
 public class SomnusManager extends JavaPlugin {
 
@@ -63,6 +64,7 @@ public class SomnusManager extends JavaPlugin {
 	public void init() {
 		openConnection();
 		checkTables();
+		new EventManager(this);
 		this.am = new ArenaManager(this);
 		this.qwm = new QuickWarpManager(this);
 		this.rm = new RandomManager(this);

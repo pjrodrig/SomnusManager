@@ -39,6 +39,7 @@ public class MarriageManager {
 	private LogoutListener logoutListener;
 	private IDoListener iDoListener;
 	private BukkitTask timer;
+	private boolean enabled;
 
 	public MarriageManager(SomnusManager sm) {
 		this.sm = sm;
@@ -51,6 +52,7 @@ public class MarriageManager {
 
 	public void init() {
 		FileConfiguration config = getMarriageConfig();
+		enabled = config.getBoolean("Enabled");
 		warp = ConfigUtil.loadLocation(sm.getServer(), config, "Church.Warp.");
 		priestLoc = ConfigUtil.loadLocation(sm.getServer(), config, "Church.Priest.");
 		p1Loc = ConfigUtil.loadLocation(sm.getServer(), config, "Church.P1.");
@@ -75,12 +77,28 @@ public class MarriageManager {
 		}
 	}
 
+	public boolean isEnabled() {
+		return enabled;
+	}
+
+	public void enable() {
+		FileConfiguration config = getMarriageConfig();
+		config.set("Enabled", true);
+		saveMarriageConfig();
+	}
+
+	public void disable() {
+		FileConfiguration config = getMarriageConfig();
+		config.set("Enabled", false);
+		saveMarriageConfig();
+	}
+
 	public void saveCouple(Couple couple) {
 		FileConfiguration config = getMarriageConfig();
 		UUID p1 = couple.getPlayer1(), p2 = couple.getPlayer2();
 		String path = "Marriages." + p1 + "|" + p2 + ".";
-		config.set(path + "P1", p1);
-		config.set(path + "P2", p2);
+		config.set(path + "P1", p1.toString());
+		config.set(path + "P2", p2.toString());
 		if (couple.hasHome()) {
 			ConfigUtil.saveLocation(config, path + "Home.", couple.getHome());
 		}
@@ -121,7 +139,9 @@ public class MarriageManager {
 
 	public void propose(Player proposer, Player proposee) {
 		UUID proposerId = proposer.getUniqueId(), proposeeId = proposee.getUniqueId();
-		if (marriages.containsKey(proposerId)) {
+		if (proposerId.equals(proposeeId)) {
+			proposer.sendMessage(ChatColor.RED + "You cannot marry yourself.");
+		} else if (marriages.containsKey(proposerId)) {
 			proposer.sendMessage(ChatColor.RED
 					+ "You are already married. Use '/divorce' to divorce.");
 		} else if (marriages.containsKey(proposeeId)) {
@@ -196,7 +216,8 @@ public class MarriageManager {
 		server.broadcastMessage(ChatColor.LIGHT_PURPLE + p1.getName() + ChatColor.GRAY + " and "
 				+ ChatColor.LIGHT_PURPLE + p2.getName() + ChatColor.GRAY
 				+ " have agreed to get married.");
-		server.broadcastMessage(ChatColor.GRAY + "Is there a priest or an acolyte who will marry them? Use "
+		server.broadcastMessage(ChatColor.GRAY
+				+ "Is there a priest or an acolyte who will marry them? Use "
 				+ ChatColor.LIGHT_PURPLE + "/marry priest ");
 		timer = server.getScheduler().runTaskLater(sm, new Runnable() {
 			public void run() {

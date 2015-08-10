@@ -37,7 +37,7 @@ public class IDoListener implements Listener {
 		first = true;
 		final Server server = sm.getServer();
 		server.broadcastMessage(ChatColor.GRAY + priest.getName() + ": " + ChatColor.GRAY
-				+ "The wedding will commence in one minute.");
+				+ "The wedding will commence shortly.");
 		server.getScheduler().runTaskLater(sm, new Runnable() {
 			public void run() {
 				broadcastNear(ChatColor.YELLOW + priest.getName() + ": Do you, " + p1.getName()
@@ -50,10 +50,11 @@ public class IDoListener implements Listener {
 								+ "failed to say 'I do'. The wedding was canceled.");
 						mm.cancelWedding();
 						timer = null;
+						unregister();
 					}
 				}, 20 * 20);
 			}
-		}, 20 * 60);
+		}, 20 * 15);
 	}
 
 	@EventHandler
@@ -96,6 +97,7 @@ public class IDoListener implements Listener {
 							+ "failed to say 'I do'. The wedding was canceled.");
 					mm.cancelWedding();
 					timer = null;
+					unregister();
 				}
 			}, 20 * 30);
 		} else {

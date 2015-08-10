@@ -70,6 +70,18 @@ commands:
         description: Divorce your spouse
         usage: /marry help
         permission: SomnusManager.default
+     event:
+        description: All event commands
+        usage: /event help
+        permission: SomnusManager.Admin
+     love:
+        description: command for love letters event
+        usage: /love <player> <message>
+        permission: SomnusManager.default
+     bid:
+        description: bid for lottery
+        usage: /bid
+        permission: SomnusManager.default
 permissions:
     SomnusManager.*:
         description: Gives access to all SomnusManager commands.
