@@ -82,7 +82,7 @@ commands:
         description: bid for lottery
         usage: /bid
         permission: SomnusManager.default
-    math:
+     math:
         description: submit math answer
         usage: /math <answer>
         permission: SomnusManager.default
