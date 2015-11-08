@@ -10,6 +10,8 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 import com.yahoo.prosfis.somnusmanager.arena.ArenaManager;
 
+import net.md_5.bungee.api.ChatColor;
+
 public class ArenaListener implements Listener {
 
 	private final ArenaManager am;
@@ -24,10 +26,13 @@ public class ArenaListener implements Listener {
 		if (ent instanceof Player) {
 			Player challenger = event.getPlayer();
 			Material item = challenger.getItemInHand().getType();
-			if (item == Material.WOOD_SWORD || item == Material.IRON_SWORD
-					|| item == Material.GOLD_SWORD
+			if (item == Material.WOOD_SWORD || item == Material.IRON_SWORD || item == Material.GOLD_SWORD
 					|| item == Material.DIAMOND_SWORD) {
-				am.challenge(challenger, (Player) ent);
+				if (challenger.getWorld().getName().equals("Dungeon")) {
+					challenger.sendMessage(ChatColor.RED + "Challenging is disabled in this world");
+				} else {
+					am.challenge(challenger, (Player) ent);
+				}
 			}
 		}
 	}
