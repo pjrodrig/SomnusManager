@@ -12,7 +12,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.scoreboard.DisplaySlot;
@@ -83,7 +82,7 @@ public class MineContestEvent implements Event, Listener {
 	public void stop() {
 		Server server = sm.getServer();
 		PlayerJoinEvent.getHandlerList().unregister(this);
-		PlayerToggleSneakEvent.getHandlerList().unregister(this);
+		BlockBreakEvent.getHandlerList().unregister(this);
 		scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
 		for (Player player : server.getOnlinePlayers()) {
 			player.setScoreboard(scoreboard);

@@ -10,6 +10,7 @@ import com.yahoo.prosfis.somnusmanager.events.events.Event;
 import com.yahoo.prosfis.somnusmanager.events.events.GoToHellEvent;
 import com.yahoo.prosfis.somnusmanager.events.events.LotteryEvent;
 import com.yahoo.prosfis.somnusmanager.events.events.LoveLettersEvent;
+import com.yahoo.prosfis.somnusmanager.events.events.MathsEvent;
 import com.yahoo.prosfis.somnusmanager.events.events.MineContestEvent;
 import com.yahoo.prosfis.somnusmanager.events.events.QuietTimeEvent;
 import com.yahoo.prosfis.somnusmanager.events.events.TwerkContestEvent;
@@ -39,6 +40,7 @@ public class EventManager {
 		events.put(EventType.QUIET_TIME, new QuietTimeEvent(sm));
 		events.put(EventType.GO_TO_HELL, new GoToHellEvent(sm));
 		events.put(EventType.MINE_CONTEST, new MineContestEvent(sm));
+		events.put(EventType.MATHS, new MathsEvent(sm));
 		new EventCommandExecutor(this, sm);
 	}
 

@@ -82,6 +82,10 @@ commands:
         description: bid for lottery
         usage: /bid
         permission: SomnusManager.default
+    math:
+        description: submit math answer
+        usage: /math <answer>
+        permission: SomnusManager.default
 permissions:
     SomnusManager.*:
         description: Gives access to all SomnusManager commands.
