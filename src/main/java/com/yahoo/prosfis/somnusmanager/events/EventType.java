@@ -5,7 +5,7 @@ import java.util.Map;
 import com.google.common.collect.Maps;
 
 public enum EventType {
-	LOVE_LETTERS, TWERK_CONTEST, LOTTERY, QUIET_TIME, GO_TO_HELL, MINE_CONTEST, MATHS;
+	LOVE_LETTERS, TWERK_CONTEST, LOTTERY, QUIET_TIME, GO_TO_HELL, MINE_CONTEST, MATHS, SECRETS;
 	
 	private final static Map<String, EventType> BY_NAME = Maps.newHashMap();
 	

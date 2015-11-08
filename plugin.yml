@@ -86,6 +86,10 @@ commands:
         description: submit math answer
         usage: /math <answer>
         permission: SomnusManager.default
+     secret:
+        description: submit a secret
+        usage: /secret <message>
+        permission: SomnusManager.default
 permissions:
     SomnusManager.*:
         description: Gives access to all SomnusManager commands.

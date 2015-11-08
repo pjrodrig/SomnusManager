@@ -13,6 +13,7 @@ import com.yahoo.prosfis.somnusmanager.events.events.LoveLettersEvent;
 import com.yahoo.prosfis.somnusmanager.events.events.MathsEvent;
 import com.yahoo.prosfis.somnusmanager.events.events.MineContestEvent;
 import com.yahoo.prosfis.somnusmanager.events.events.QuietTimeEvent;
+import com.yahoo.prosfis.somnusmanager.events.events.SecretsEvent;
 import com.yahoo.prosfis.somnusmanager.events.events.TwerkContestEvent;
 
 import net.md_5.bungee.api.ChatColor;
@@ -41,6 +42,7 @@ public class EventManager {
 		events.put(EventType.GO_TO_HELL, new GoToHellEvent(sm));
 		events.put(EventType.MINE_CONTEST, new MineContestEvent(sm));
 		events.put(EventType.MATHS, new MathsEvent(sm));
+		events.put(EventType.SECRETS, new SecretsEvent(sm));
 		new EventCommandExecutor(this, sm);
 	}
 

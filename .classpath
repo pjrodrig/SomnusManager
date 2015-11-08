@@ -32,6 +32,6 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="C:/Users/Alex/Desktop/SomnusRealmsTest/spigot.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Paul/plugins/spigot.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

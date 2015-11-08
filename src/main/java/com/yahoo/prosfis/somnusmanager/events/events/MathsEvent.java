@@ -12,6 +12,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
@@ -30,6 +31,7 @@ public class MathsEvent implements Event, CommandExecutor, Listener {
 	private String question;
 	private Score wrongAnswers;
 	private boolean active, roundActive;
+	private BukkitTask task;
 
 	public MathsEvent(SomnusManager sm) {
 		this.sm = sm;
@@ -44,7 +46,7 @@ public class MathsEvent implements Event, CommandExecutor, Listener {
 		wrongAnswers = objective.getScore(ChatColor.GOLD + "Count:");
 		sm.getCommand("math").setExecutor(this);
 		active = true;
-		round = 1;
+		round = 0;
 		Server server = sm.getServer();
 		for (Player player : server.getOnlinePlayers()) {
 			player.setScoreboard(scoreboard);
@@ -56,6 +58,7 @@ public class MathsEvent implements Event, CommandExecutor, Listener {
 
 	public void stop() {
 		active = false;
+		round = 0;
 		PlayerJoinEvent.getHandlerList().unregister(this);
 		Server server = sm.getServer();
 		scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
@@ -65,12 +68,13 @@ public class MathsEvent implements Event, CommandExecutor, Listener {
 	}
 
 	private void startRound() {
+		round++;
 		roundActive = true;
 		Server server = sm.getServer();
 		wrongAnswers.setScore(0);
 		generateQuestion();
-		server.broadcastMessage(ChatColor.DARK_GREEN + "Round " + round + ":" + ChatColor.GOLD + "\n" + question + "\nUse " + ChatColor.GOLD + "/math <answer>" + ChatColor.GREEN + " to answer.");
-		server.getScheduler().runTaskLater(sm, new Runnable() {
+		server.broadcastMessage(ChatColor.DARK_GREEN + "Round " + round + ":" + ChatColor.GOLD + "\n" + question + ChatColor.DARK_GREEN + "\nUse " + ChatColor.GOLD + "/math <answer>" + ChatColor.DARK_GREEN + " to answer.");
+		task = server.getScheduler().runTaskLater(sm, new Runnable() {
 			public void run() {
 				endRound(null);
 			}
@@ -116,7 +120,7 @@ public class MathsEvent implements Event, CommandExecutor, Listener {
 			num1 = getSmallNumber();
 			num2 = getSmallNumber();
 			answer = num2;
-			question = num1 + " / " + (num1 * num2) + " = ?";
+			question = (num1 * num2) + " / " + num1 + " = ?";
 			break;
 		}
 	}
@@ -225,18 +229,19 @@ public class MathsEvent implements Event, CommandExecutor, Listener {
 			server.broadcastMessage(ChatColor.DARK_GREEN + "Time is up! The answer was: " + ChatColor.GOLD + answer
 					+ ChatColor.DARK_GREEN + "\nThere were no winners this round.");
 		} else {
+			task.cancel();
 			server.broadcastMessage(ChatColor.GOLD + player.getName() + ChatColor.DARK_GREEN
 					+ " has answered correctly!\nThe answer was: " + ChatColor.GOLD + answer);
 			PlayerUtil.giveItem(player, new ItemStack(Material.GOLD_INGOT, round * 5));
-			if (round > 3) {
-				server.getScheduler().runTaskLater(sm, new Runnable() {
-					public void run() {
-						startRound();
-					}
-				}, 20 * 10);
-			} else {
-				stop();
-			}
+		}
+		if (round < 3) {
+			server.getScheduler().runTaskLater(sm, new Runnable() {
+				public void run() {
+					startRound();
+				}
+			}, 20 * 10);
+		} else {
+			stop();
 		}
 	}
 
