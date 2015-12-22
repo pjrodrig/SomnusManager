@@ -51,12 +51,13 @@ public class MarriageManager {
 	}
 
 	public void init() {
+		Server server = sm.getServer();
 		FileConfiguration config = getMarriageConfig();
 		enabled = config.getBoolean("Enabled");
-		warp = ConfigUtil.loadLocation(sm.getServer(), config, "Church.Warp.");
-		priestLoc = ConfigUtil.loadLocation(sm.getServer(), config, "Church.Priest.");
-		p1Loc = ConfigUtil.loadLocation(sm.getServer(), config, "Church.P1.");
-		p2Loc = ConfigUtil.loadLocation(sm.getServer(), config, "Church.P2.");
+		warp = ConfigUtil.loadLocation(server, config, "Church.Warp.");
+		priestLoc = ConfigUtil.loadLocation(server, config, "Church.Priest.");
+		p1Loc = ConfigUtil.loadLocation(server, config, "Church.P1.");
+		p2Loc = ConfigUtil.loadLocation(server, config, "Church.P2.");
 		ConfigurationSection section = config.createSection("Marriages");
 		Iterator<String> iter = section.getValues(false).keySet().iterator();
 		String path;
@@ -67,7 +68,7 @@ public class MarriageManager {
 			path = "Marriages." + iter.next() + ".";
 			p1 = UUID.fromString(config.getString(path + "P1"));
 			p2 = UUID.fromString(config.getString(path + "P2"));
-			loc = ConfigUtil.loadLocation(sm.getServer(), config, path + "Home.");
+			loc = ConfigUtil.loadLocation(server, config, path + "Home.");
 			couple = new Couple(p1, p2);
 			if (loc != null)
 				couple.setHome(loc);
@@ -184,27 +185,28 @@ public class MarriageManager {
 				player.sendMessage(ChatColor.RED + "That player is no longer online.");
 				proposals.remove(id);
 			} else {
-				switch (status) {
-				case OPEN:
-					p1 = spouse;
-					p2 = player;
-					logoutListener = new LogoutListener(p1, p2, this);
-					sm.getServer().getPluginManager().registerEvents(logoutListener, sm);
-					status = Status.PLANNING;
-					getPriest();
-					break;
-				case PLANNING:
-					player.sendMessage(ChatColor.RED
-							+ "Another wedding is currently being planned.");
-					break;
-				case ACTIVE:
-					player.sendMessage(ChatColor.RED + "Another wedding is taking place.");
-					break;
-				case COOLDOWN:
-					player.sendMessage(ChatColor.RED
-							+ "The church is being prepared. Please try again soon.");
-					break;
-				}
+				marry(spouse, player);
+//				switch (status) {
+//				case OPEN:
+//					p1 = spouse;
+//					p2 = player;
+//					logoutListener = new LogoutListener(p1, p2, this);
+//					sm.getServer().getPluginManager().registerEvents(logoutListener, sm);
+//					status = Status.PLANNING;
+//					getPriest();
+//					break;
+//				case PLANNING:
+//					player.sendMessage(ChatColor.RED
+//							+ "Another wedding is currently being planned.");
+//					break;
+//				case ACTIVE:
+//					player.sendMessage(ChatColor.RED + "Another wedding is taking place.");
+//					break;
+//				case COOLDOWN:
+//					player.sendMessage(ChatColor.RED
+//							+ "The church is being prepared. Please try again soon.");
+//					break;
+//				}
 			}
 		} else {
 			player.sendMessage(ChatColor.RED + "You have no active proposals at this time.");
