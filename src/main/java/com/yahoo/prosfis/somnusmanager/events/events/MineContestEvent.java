@@ -94,8 +94,8 @@ public class MineContestEvent implements Event, Listener {
 			server.broadcastMessage(ChatColor.DARK_GREEN + "Winner: " + ChatColor.GOLD
 					+ topPlayer.getName() + ChatColor.DARK_GREEN + " with a score of "
 					+ ChatColor.GOLD + topScore + ChatColor.DARK_GREEN + " blocks broken!");
+			PlayerUtil.giveItem(topPlayer, new ItemStack(Material.GOLD_INGOT, 10));
 		}
-		PlayerUtil.giveItem(topPlayer, new ItemStack(Material.GOLD_INGOT, 10));
 		topPlayer = null;
 		topScore = 0;
 	}
